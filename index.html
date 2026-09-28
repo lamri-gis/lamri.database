@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Catatan silsilah keturunan Lemuang, disusun oleh Lamri, S.P.">
+<title>Silsilah Lemuang</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@500;700&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+:root {
+  --paper: #EDF0EA;
+  --panel: #F8FAF6;
+  --ink: #1E2922;
+  --muted: #5F6A63;
+  --ulin: #6B4528;
+  --line: #B79C84;
+  --river: #1D6A73;
+  --river-soft: #D6E7E8;
+  --flash: #F3E3B8;
+  --batu: #7D8380;
+  --focus: #1D6A73;
+  --serif: "Alegreya", Georgia, "Times New Roman", serif;
+  --sans: "Alegreya Sans", "Segoe UI", Roboto, Arial, sans-serif;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #161C18; --panel: #1F2722; --ink: #E4EAE5; --muted: #9AA59E;
+    --ulin: #D2A77F; --line: #6A5645; --river: #6FC1C9; --river-soft: #1E3A3D;
+    --flash: #4A3D1E; --batu: #8E9591; --focus: #6FC1C9;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #161C18; --panel: #1F2722; --ink: #E4EAE5; --muted: #9AA59E;
+  --ulin: #D2A77F; --line: #6A5645; --river: #6FC1C9; --river-soft: #1E3A3D;
+  --flash: #4A3D1E; --batu: #8E9591; --focus: #6FC1C9;
+}
+*, *::before, *::after { box-sizing: inherit; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--sans); font-size: 1.0625rem; line-height: 1.5;
+}
+.wrap { max-width: 46rem; margin: 0 auto; padding: 2rem 1.1rem 4rem; }
+
+header h1 {
+  font-family: var(--serif); font-weight: 700; color: var(--ulin);
+  font-size: clamp(2.2rem, 7vw, 3.2rem); line-height: 1.05; margin: 0 0 .35rem;
+  letter-spacing: -.01em;
+}
+.by { margin: 0 0 1.25rem; color: var(--muted); font-size: 1rem; }
+.hint { margin: 0 0 1rem; max-width: 38rem; }
+.legend { display: flex; flex-wrap: wrap; gap: .4rem 1.1rem; margin: 0 0 1.25rem; padding: 0; color: var(--muted); font-size: .95rem; }
+.legend div { display: flex; gap: .35rem; }
+.legend dt { font-weight: 700; color: var(--ink); }
+.legend dd { margin: 0; }
+.tools { display: flex; gap: .5rem; margin-bottom: 1.75rem; }
+.tools button, .d-actions button, .jump {
+  font: inherit; font-size: .95rem; padding: .4rem .85rem; border-radius: 999px;
+  border: 1px solid var(--line); background: transparent; color: var(--ink); cursor: pointer;
+  touch-action: manipulation;
+}
+.tools button:hover, .d-actions button:hover, .jump:hover { border-color: var(--river); color: var(--river); }
+.jump { font-size: .85rem; padding: .15rem .6rem; }
+
+ul.tree, ul.branch { list-style: none; margin: 0; padding: 0; }
+ul.branch { margin-left: 13px; padding-left: 1.1rem; border-left: 2px solid var(--line); }
+ul.branch > li { position: relative; }
+ul.branch > li::before {
+  content: ""; position: absolute; left: -1.1rem; top: 1.25rem;
+  width: .9rem; border-top: 2px solid var(--line);
+}
+li.root { margin-bottom: 1.5rem; }
+li.root > .row {
+  background: var(--panel); border-left: 4px solid var(--ulin);
+  border-radius: 0 10px 10px 0; padding: .6rem .75rem;
+}
+li.root > .row .name { font-size: 1.3rem; }
+
+.row { display: flex; align-items: center; flex-wrap: wrap; gap: .15rem .45rem; padding: .25rem 0; border-radius: 8px; }
+.row.flash { animation: flash 2.2s ease-out; }
+@keyframes flash { 0%, 40% { background: var(--flash); } 100% { background: transparent; } }
+.toggle {
+  width: 28px; height: 28px; flex: none; border-radius: 50%;
+  border: 1.5px solid var(--line); background: var(--panel); color: var(--ulin);
+  cursor: pointer; display: grid; place-items: center; padding: 0; touch-action: manipulation;
+}
+.toggle svg { transition: transform .15s ease; }
+li.open > .row .toggle svg { transform: rotate(90deg); }
+.leaf { width: 28px; flex: none; display: grid; place-items: center; }
+.leaf::after { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--line); }
+
+li.group > .row { padding: .35rem 0 .15rem; }
+.ring { width: 28px; flex: none; display: grid; place-items: center; }
+.ring::after { content: ""; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--ulin); background: var(--paper); }
+.glabel { font-size: .92rem; font-weight: 700; color: var(--ulin); }
+.glabel.unknown { font-weight: 500; color: var(--muted); font-style: italic; }
+
+.name, .spouse {
+  font-family: var(--serif); font-weight: 500; font-size: 1.12rem; color: var(--ink);
+  background: none; border: 0; padding: .1rem .3rem; margin: 0; border-radius: 6px; cursor: pointer;
+  text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 4px;
+  touch-action: manipulation; user-select: none; -webkit-user-select: none;
+}
+.name:hover, .spouse:hover { background: var(--river-soft); text-decoration-color: var(--river); }
+.spouse { font-size: 1.05rem; }
+.jk { font-family: var(--sans); font-size: .85rem; color: var(--muted); margin-left: .2rem; }
+.alm { font-family: var(--sans); font-size: .85rem; color: var(--batu); font-style: italic; margin-left: .25rem; }
+.meta { font-size: .88rem; color: var(--muted); }
+.amp { color: var(--muted); }
+.kin { font: inherit; font-size: .8rem; color: var(--river); background: var(--river-soft); border: 1px solid var(--river); border-radius: 999px; padding: 0 .55rem; cursor: pointer; touch-action: manipulation; }
+.kin:hover { background: var(--river); color: var(--panel); }
+.name.unnamed { font-style: italic; color: var(--muted); }
+.flag { font-size: .78rem; color: #8A5A00; border: 1px solid #D9B25C; border-radius: 999px; padding: 0 .45rem; }
+.d-body dt.konf, .d-body dd.konf { color: #8A5A00; }
+@media (prefers-color-scheme: dark) { .flag, .d-body dt.konf, .d-body dd.konf { color: #E8C27A; border-color: #8A6A2A; } }
+
+button:focus-visible, a:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+dialog {
+  border: 0; padding: 0; width: min(34rem, calc(100% - 2rem));
+  background: var(--panel); color: var(--ink); border-radius: 14px;
+  box-shadow: 0 18px 50px rgba(20, 30, 25, .28);
+}
+dialog::backdrop { background: rgba(15, 22, 18, .45); }
+.d-head { padding: 1.1rem 1.2rem .6rem; border-bottom: 1px solid var(--line); position: relative; }
+.d-head h2 { font-family: var(--serif); font-size: 1.6rem; margin: 0; padding-right: 2.5rem; color: var(--ulin); line-height: 1.15; }
+.d-sub { margin: .2rem 0 0; color: var(--muted); font-size: .95rem; }
+.d-close {
+  position: absolute; top: .8rem; right: .8rem; width: 34px; height: 34px; border-radius: 50%;
+  border: 1px solid var(--line); background: transparent; color: var(--ink); font-size: 1.2rem; cursor: pointer;
+}
+.d-body { padding: .9rem 1.2rem 1.3rem; max-height: 70vh; overflow-y: auto; }
+.d-body dl { margin: 0; display: grid; grid-template-columns: minmax(8rem, auto) 1fr; gap: .45rem 1rem; }
+.d-body dt { color: var(--muted); font-size: .95rem; }
+.d-body dd { margin: 0; }
+.d-body dd .line + .line { margin-top: .3rem; }
+.d-body dd .line b { font-weight: 700; color: var(--ulin); }
+.d-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.1rem; }
+.d-actions button.primary { background: var(--river); border-color: var(--river); color: var(--panel); }
+.empty { color: var(--batu); font-style: italic; }
+.map-box { margin-top: 1rem; }
+.map { height: 210px; border-radius: 10px; border: 1px solid var(--line); margin-top: .5rem; }
+.map-links { display: flex; flex-wrap: wrap; gap: .4rem 1rem; margin-top: .45rem; font-size: .95rem; }
+.map-links a { color: var(--river); }
+
+@media (max-width: 560px) {
+  dialog { width: 100%; max-width: 100%; margin: auto 0 0; border-radius: 16px 16px 0 0; }
+  .d-body { padding-bottom: calc(1.3rem + env(safe-area-inset-bottom, 0px)); }
+  .d-body dl { grid-template-columns: 1fr; gap: .1rem; }
+  .d-body dd { margin-bottom: .55rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .toggle svg { transition: none; }
+  .row.flash { animation: none; background: var(--flash); }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Silsilah Lemuang</h1>
+    <p class="by">Catatan silsilah oleh Lamri, S.P.</p>
+    <p class="hint">Ketuk nama sekali untuk melihat detail. Ketuk dua kali untuk membuka anak-anaknya. Tombol panah di sebelah kiri nama juga membuka dan menutup anak. Nama pasangan, ayah, dan ibu ada di pop up. Tanda "kawin sepupu" bisa diketuk untuk melihat pasangan atau anaknya; untuk perkawinan sesama keturunan, anak dicatat di cabang suami.</p>
+    <dl class="legend">
+      <div><dt>L</dt><dd>laki-laki</dd></div>
+      <div><dt>P</dt><dd>perempuan</dd></div>
+      <div><dt>Alm. / Almh.</dt><dd>sudah wafat</dd></div>
+      <div><dt>kawin sepupu</dt><dd>pasangan sesama keturunan, bisa diketuk</dd></div>
+    </dl>
+    <div class="tools">
+      <button type="button" id="openAll">Buka semua</button>
+      <button type="button" id="closeAll">Tutup semua</button>
+    </div>
+  </header>
+  <main>
+    <ul class="tree" id="tree"></ul>
+  </main>
+</div>
+
+<dialog id="detail" aria-labelledby="dTitle">
+  <div class="d-head">
+    <h2 id="dTitle"></h2>
+    <p class="d-sub" id="dSub"></p>
+    <button type="button" class="d-close" id="dClose" aria-label="Tutup detail">&times;</button>
+  </div>
+  <div class="d-body" id="dBody"></div>
+</dialog>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+/*
+  DATA SILSILAH
+
+  Cara menulis satu orang:
+    h("Nama", "L" atau "P", { ... })   orang yang masih hidup
+    w("Nama", "L" atau "P", { ... })   orang yang sudah wafat (otomatis tampil Alm./Almh.)
+    u("Nama", "L" atau "P", { ... })   status hidup/wafat belum dicatat
+    nn({ ... })                          anak yang namanya belum dicatat
+
+  Kolom tambahan (semua opsional):
+    id              kode unik, wajib untuk orang yang menikah dengan sesama keturunan
+    alias, panggilan, anakKe, tahunLahir, tidakBeranak: true,
+    tempatLahir, dibesarkan, domisili, tinggalSekarang,
+    tempatWafat, makam: { nama: "...", lat: 0.0, lng: 0.0 },
+    catatan, konfirmasi   (hal yang masih perlu dipastikan)
+
+  Pasangan (bisa lebih dari satu, urutannya menjadi Pasangan 1, 2, dst):
+    pasangan: [ u("Nama", "L", { anak: [ ... ] }) ]      pasangan dari luar keluarga
+    pasangan: [ { ref: "id-istri", anak: [ ... ] } ]     pasangan sesama keturunan
+
+  Perkawinan sesama keturunan:
+    Anak dicatat di pihak pria memakai { ref: "id-istri", anak: [...] }.
+    Pihak wanita cukup diberi id. Kalau urutan suaminya perlu diatur
+    (misalnya suami pertama dan kedua), tulis { ref: "id-suami" } di
+    daftar pasangan wanita pada urutan yang benar, tanpa anak.
+
+  NIK sengaja tidak disediakan.
+*/
+const h = (nama, jk, o) => Object.assign({ nama, jk, wafat: false }, o || {});
+const w = (nama, jk, o) => Object.assign({ nama, jk, wafat: true }, o || {});
+const u = (nama, jk, o) => Object.assign({ nama, jk }, o || {});
+const nn = (o) => Object.assign({ nama: "(nama belum dicatat)", belumBernama: true }, o || {});
+
+const SD = "Susuk Dalam", BL = "Batu Lepok", SMD = "Samarinda", BLD = "Belidan";
+const ST = "Susuk Tengah", SL = "Susuk Luar", PB = "Pengadan Baru";
+const AMBP = "Ampen Medang/Batu Putih", SAPAM = "Sapinang/Ampan Medang";
+const LKBP = "Lobang Klatak/Batu Putih", KLK = "Kakauan/Lubang Klatak";
+const hsd = (nama, jk, o) => h(nama, jk, Object.assign({ tempatLahir: SD, tinggalSekarang: SD }, o || {}));
+
+/* ====================================================================
+   KETURUNAN KUNGGIT (kakak)
+   ==================================================================== */
+const KUNGGIT = w("Kunggit", "P", { id: "kunggit", anakKe: 1, tempatLahir: "Lemuang", pasangan: [
+  w("Legom", "L", { anak: [
+
+    w("Singking", "P", { anakKe: 1, tempatLahir: "Lemuang", tidakBeranak: true }),
+
+    w("Talenttan", "P", { anakKe: 2, tempatLahir: "Lemuang", makam: { nama: "Susuk Tengah/Siah" }, pasangan: [
+      u("Putus", "L", { anak: [
+        w("Jaena", "P", { id: "jaena", alias: "Jainah", anakKe: 1, tempatLahir: SD, tinggalSekarang: BL, makam: { nama: "Samarinda" }, pasangan: [
+          { ref: "bahar" },
+          u("Ijun", "L", { alias: "China", anak: [
+            h("Aliah", "P", { alias: "Miliah", anakKe: 2, tempatLahir: "Kutai Timur", tinggalSekarang: SMD, pasangan: [
+              u("Syahran", "L", { anak: [
+                h("Normansyah", "L", { tahunLahir: 1984, tempatLahir: SMD, tinggalSekarang: SMD, pasangan: [
+                  u("Kurnia Dewi", "P", { anak: [
+                    h("Raditya Putra Pratama", "L", { tempatLahir: SMD, tinggalSekarang: SMD }),
+                    h("Zhela Putri Cantika Dewi", "P", { tempatLahir: SMD, tinggalSekarang: SMD }),
+                    h("Syifa Salsabila", "P", { tempatLahir: SMD, tinggalSekarang: SMD }),
+                    h("Muhammad Akbar Al-Fatih", "L", { tempatLahir: SMD, tinggalSekarang: SMD }),
+                    h("Arsha Arka Rafatan", "L", { tempatLahir: SMD, tinggalSekarang: SMD })
+                  ]})
+                ]}),
+                h("Fitri", "P", { tahunLahir: 1989, tempatLahir: SMD, tinggalSekarang: SMD, pasangan: [
+                  u("Aspian Nur", "L", { anak: [
+                    h("Marina Putri", "P", { tempatLahir: SMD, tinggalSekarang: SMD }),
+                    h("Ahmad Fauzan", "L", { tempatLahir: SMD, tinggalSekarang: SMD }),
+                    h("Ahmad Fais Rahman", "L", { tempatLahir: SMD, tinggalSekarang: SMD })
+                  ]})
+                ]}),
+                h("Hermansyah", "L", { tahunLahir: 1986, tempatLahir: SMD, tinggalSekarang: SMD, pasangan: [
+                  u("Astriani", "P", { anak: [
+                    h("Nur Syafa", "P", { tempatLahir: SMD, tinggalSekarang: SMD }),
+                    h("Liansyah", "L", { tempatLahir: SMD, tinggalSekarang: SMD })
+                  ]})
+                ]}),
+                h("Elsa Yuniar", "P", { tahunLahir: 2002, tempatLahir: SMD })
+              ]})
+            ]}),
+            h("Kipli", "L", { anakKe: 3, tempatLahir: SMD }),
+            h("Arbayah", "P", { alias: "Baiyah", anakKe: 4, tempatLahir: "Sangkulirang",
+              pasangan: [
+                u("M. Aliansyah", "L", { anak: [
+                  h("Rianti", "P", { anakKe: 1, tempatLahir: "Berau" }),
+                  h("Wulandari", "P", { anakKe: 2, tempatLahir: "Berau" }),
+                  h("Abdul Fatah", "L", { anakKe: 3, tempatLahir: "Berau" })
+                ]}),
+                u("Muhammad Ali", "L", { anak: [
+                  h("Aurel Nopitasari", "P", { anakKe: 4, tempatLahir: "Berau" }),
+                  h("Muhammad Riski", "L", { anakKe: 5, tempatLahir: "Berau" })
+                ]})
+              ]}),
+            h("Erni Marlina", "P", { anakKe: 5, tempatLahir: SMD, pasangan: [
+              u("A. Supiani", "L", { anak: [
+                h("Nor Aysiah", null, { anakKe: 1 }),
+                h("Kurmiawan", null, { anakKe: 2 })
+              ]})
+            ]})
+          ]})
+        ]}),
+        w("Saonah", "P", { alias: "Saunah", anakKe: 2, tempatLahir: SD, tinggalSekarang: BL, makam: { nama: "Batu Lepok" }, pasangan: [
+          u("Seput", "L", { anak: [
+            h("Jum\u2019ah", "P", { anakKe: 1, tempatLahir: SD }),
+            h("Kasran", "L", { anakKe: 2, tempatLahir: SD }),
+            h("Ijur", "L", { anakKe: 3, tempatLahir: SD }),
+            h("Gaga", "L", { anakKe: 4, tempatLahir: SD }),
+            h("Iling", "L", { anakKe: 5, tempatLahir: SD }),
+            h("Erna", "P", { anakKe: 6, tempatLahir: SD }),
+            h("Jupri", "L", { anakKe: 7, tempatLahir: SD }),
+            h("Oman", "L", { anakKe: 8, tempatLahir: SD })
+          ]})
+        ]})
+      ]})
+    ]}),
+
+    w("Pipi", "P", { anakKe: 3, tempatLahir: "Lemuang", dibesarkan: "Susuk", makam: { nama: "Sapatrudin" }, pasangan: [
+      u("Alin", "L", { anak: [
+        w("Mawar", "P", { anakKe: 1, tempatLahir: "Susuk", makam: { nama: "Mesjid" } }),
+        w("Usran", "L", { anakKe: 2, tempatLahir: "Susuk", makam: { nama: "Mesjid" }, pasangan: [
+          u("Lisahan", "P", { anak: [
+            w("Bahran", "L", { anakKe: 1, tempatLahir: "Susuk", makam: { nama: "Mesjid" },
+              pasangan: [
+                u("Irus", "P", { anak: [
+                  h("Rudi", "L", { anakKe: 1, tinggalSekarang: SD }),
+                  h("Riswan", "L", { anakKe: 2, tinggalSekarang: SD }),
+                  h("Reko", "L", { anakKe: 3, tinggalSekarang: SD })
+                ]})
+              ]}),
+            hsd("Mansyah", "L", { id: "mansyah", anakKe: 2,
+              pasangan: [
+                { ref: "inarwati", anak: [
+                  hsd("Dewi Asma Sari", "P", { anakKe: 1, anak: [ nn({ anakKe: 1, wafat: false, tinggalSekarang: SD }) ] }),
+                  hsd("Hepita", "P", { anakKe: 2 }),
+                  hsd("Fajar", "L", { anakKe: 3 })
+                ]}
+              ]}),
+            hsd("Rugayah", "P", { anakKe: 3, pasangan: [
+              u("Muslim", "L", { anak: [ h("Paris", "L", { anakKe: 1, tinggalSekarang: SD }) ] })
+            ]}),
+            h("Jumariah", "P", { id: "jumariah", alias: "Icum", anakKe: 4, tempatLahir: SD })
+          ]})
+        ]}),
+        w("Ipin", "L", { anakKe: 3, tempatLahir: "Susuk", makam: { nama: "Mesjid" }, pasangan: [
+          u("Imas", "P", { anak: [ w("Idin", "L", { anakKe: 1, catatan: "Wafat usia remaja" }) ] })
+        ]}),
+        h("Usri", "L", { alias: "Seri", anakKe: 4, tinggalSekarang: SD, catatan: "Istrinya, Imas, sebelumnya istri Ipin.", pasangan: [
+          u("Imas", "P", { anak: [
+            h("Baiyah", "P", { anakKe: 1, pasangan: [
+              u("Minggu", "L", { anak: [
+                h("Isal", "P", { anakKe: 1, anak: [ nn({ wafat: false }) ] }),
+                h("Fitri", "P", { anakKe: 2 }),
+                h("Lukas", null, { anakKe: 3 }),
+                nn({ anakKe: 4, wafat: false })
+              ]})
+            ]}),
+            w("Amat", "L", { anakKe: 2, makam: { nama: "Tulang Asu" }, catatan: "Wafat usia remaja" }),
+            h("Saripudin", "L", { anakKe: 3, tinggalSekarang: SD }),
+            h("Rahman", "L", { anakKe: 4 })
+          ]})
+        ]}),
+        w("Husnah", "P", { anakKe: 5, tinggalSekarang: SD }),
+        w("Nonoy", "P", { anakKe: 6, makam: { nama: "Gunung 1" }, pasangan: [
+          u("Atom", "L", { anak: [
+            h("Iwansyah", "L", { anakKe: 1, tinggalSekarang: SD, pasangan: [
+              u("Erna", "P", { anak: [
+                h("Gafar", null, { anakKe: 1, tinggalSekarang: SD }),
+                h("Umi", null, { anakKe: 2, tinggalSekarang: SD })
+              ]})
+            ]}),
+            h("Iyansyah", "L", { anakKe: 2, tinggalSekarang: SD, pasangan: [
+              u("Pirda", "P", { anak: [ nn({ anakKe: 1, wafat: false, tinggalSekarang: SD }) ] })
+            ]})
+          ]})
+        ]}),
+        h("Imuy", "L", { anakKe: 7, tinggalSekarang: "Tadoan", anak: [
+          h("Mia", "P", { anakKe: 1, tinggalSekarang: "Tadoan" }),
+          h("Iyan", "L", { anakKe: 2, tinggalSekarang: "Tadoan" })
+        ]}),
+        h("Imbran", "L", { alias: "I\u2019im", anakKe: 8, tinggalSekarang: SD })
+      ]})
+    ]}),
+
+    w("Layau", "L", { anakKe: 4, tempatLahir: "Lemuang", makam: { nama: "Gunung 2" }, pasangan: [
+      u("Belit", "P", { anak: [
+        h("Sabariah", "P", { anakKe: 1, tempatLahir: "Susuk", tinggalSekarang: SD, pasangan: [
+          u("Jumba", "L", { anak: [
+            h("Ipi", "L", { anakKe: 1, tempatLahir: "Susuk", tinggalSekarang: BLD, pasangan: [
+              u("Saminah", "P", { anak: [
+                h("Mimir", null, { anakKe: 1, tempatLahir: BLD, dibesarkan: BLD, tinggalSekarang: BLD, pasangan: [
+                  u("Ardiansyah", "L", { anak: [
+                    h("Helma", "P", { anakKe: 1, tempatLahir: BLD }),
+                    w("Slamat", "L", { anakKe: 2, tempatLahir: BLD, makam: { nama: "RT. 4 Marukangan" }, catatan: "Wafat usia 6 bulan" })
+                  ]})
+                ]}),
+                h("Syahrulah", null, { anakKe: 2, tempatLahir: BLD, dibesarkan: BLD, tinggalSekarang: BLD }),
+                h("Arlan", null, { anakKe: 3, tempatLahir: BLD, dibesarkan: BLD, tinggalSekarang: BLD })
+              ]})
+            ]}),
+            h("Sudi", "L", { anakKe: 2, tempatLahir: "Susuk", tinggalSekarang: SD, anak: [
+              nn({ anakKe: 1, wafat: false, tinggalSekarang: SD }),
+              nn({ anakKe: 2, wafat: false, tinggalSekarang: SD })
+            ]}),
+            h("Andi", "L", { anakKe: 3, tempatLahir: "Susuk", tinggalSekarang: SD, pasangan: [
+              w("Lia", "P", { anak: [
+                h("Rusnia", "P", { anakKe: 1, tempatLahir: BLD, tinggalSekarang: SD }),
+                h("Ipal", "L", { anakKe: 2, tempatLahir: BLD, tinggalSekarang: SD })
+              ]})
+            ]}),
+            h("Mawan", "L", { anakKe: 4, tempatLahir: "Susuk", tinggalSekarang: SD }),
+            h("Nasifah", "P", { anakKe: 5, tempatLahir: "Susuk", tinggalSekarang: SD, pasangan: [
+              u("Slamet", "L", { anak: [
+                nn({ anakKe: 1, wafat: false, tinggalSekarang: SD }),
+                nn({ anakKe: 2, wafat: false, tinggalSekarang: SD })
+              ]})
+            ]})
+          ]})
+        ]}),
+        w("Jamhur", "L", { anakKe: 2, tempatLahir: "Susuk", dibesarkan: "Susuk", makam: { nama: "Mesjid" }, pasangan: [
+          u("Bentukan", "P", { anak: [
+            hsd("Inarwati", "P", { id: "inarwati" }),
+            hsd("Nengsih", "P", { pasangan: [
+              u("Firman", "L", { anak: [
+                hsd("Neli", "P", { pasangan: [ u("Nugi", null, { anak: [ nn({ wafat: false }) ] }) ] }),
+                hsd("Nila", "P")
+              ]})
+            ]}),
+            hsd("Heri", "L", { pasangan: [
+              u("Icha", "P", { anak: [ h("Ika", "P", { tempatLahir: SD }), h("Abi", "L", { tempatLahir: SL }) ] })
+            ]}),
+            h("Peri Irawan", "L", { tempatLahir: SD }),
+            hsd("Rita", "P")
+          ]})
+        ]}),
+        w("Acong", "L", { anakKe: 3, tempatLahir: SD, dibesarkan: "Susuk", makam: { nama: "Datar 1" } }),
+        h("Iyan", "L", { id: "ian", alias: "I\u2019an", anakKe: 4, tempatLahir: SD, dibesarkan: "Susuk", tinggalSekarang: SD, pasangan: [
+          { ref: "sidah", anak: [
+            w("Misnawati", "P", { tempatLahir: SD, dibesarkan: SD, makam: { nama: "Susuk/Tanjung" }, pasangan: [
+              u("Adi Wibowo", "L", { anak: [
+                h("Eka", "P", { tempatLahir: PB, tinggalSekarang: PB }),
+                h("Mista", "P", { tempatLahir: "Susuk", tinggalSekarang: PB }),
+                h("Eva", "P", { tempatLahir: PB, tinggalSekarang: PB })
+              ]})
+            ]}),
+            w("Arman", "L", { tempatLahir: "Susuk", makam: { nama: "Mesjid" }, catatan: "Wafat usia balita" }),
+            h("Yuliana", "P", { tempatLahir: "Susuk", pasangan: [
+              u("Dedy Hartawan", "L", { anak: [ h("Bayu", "L", { tempatLahir: PB }), h("Arjan", "L", { tempatLahir: PB }) ] })
+            ]}),
+            w("Ramayana", "P", { tempatLahir: SD, makam: { nama: "Mesjid" }, catatan: "Wafat usia 4 bulan" }),
+            hsd("Rusmiah", "P"),
+            w("Ina", "P", { tempatLahir: SD, makam: { nama: "Susuk Dalam/Tanjung SL" }, catatan: "Wafat usia 1 bulan" }),
+            hsd("Jamriansyah", "L"),
+            hsd("Irpandi", "L"),
+            hsd("Niki Sanjaya Putra", "L"),
+            hsd("Nagita Aulia", "P")
+          ]}
+        ]}),
+        w("Isran", "L", { alias: "I\u2019is", anakKe: 5, tempatLahir: SD, dibesarkan: "Susuk", makam: { nama: "Gunung 1" }, pasangan: [
+          u("Sinah", "P", { anak: [
+            h("Dego", "P", { tinggalSekarang: "PPU" }),
+            h("Robi", "L", { tinggalSekarang: SD }),
+            h("Riki", "L", { tinggalSekarang: SD }),
+            h("Ino", "L", { tinggalSekarang: SD })
+          ]})
+        ]})
+      ]})
+    ]})
+  ]})
+]});
+
+/* ====================================================================
+   KETURUNAN GANTIHAN (adik)
+   ==================================================================== */
+
+/* --- Anak Bahar dengan istri pertama, Jaena --- */
+const SIMAH = h("Simah", "P", { alias: "Rasimah", anakKe: 1, tahunLahir: 1961, tempatLahir: SD, pasangan: [
+  u("Arbain", "L", { anak: [
+    h("Aninun Radiyah", "P", { tahunLahir: 1979, tempatLahir: SD, pasangan: [
+      u("Jumain", "L", { anak: [
+        h("Muhammad Andriani", "L", { tempatLahir: BL, tinggalSekarang: BL }),
+        h("Muhammad Juriansyah", "L", { tempatLahir: BL, tinggalSekarang: BL }),
+        h("Dikri Dirmansyah", "L", { tempatLahir: BL, tinggalSekarang: BL }),
+        h("Rostiyani", "P", { tempatLahir: "Mukti Lestari", tinggalSekarang: BL }),
+        h("Supriyadi", "L", { tempatLahir: BL, tinggalSekarang: BL }),
+        h("Rahmad Gerhanan", "L", { tempatLahir: BL, tinggalSekarang: BL })
+      ]})
+    ]}),
+    h("Norita", "P", { tahunLahir: 1983, tempatLahir: "Susuk", tinggalSekarang: BL, pasangan: [
+      u("Roniansyah", "L", { anak: [
+        h("Nurlita Amiyanti", "P", { tempatLahir: "Sangkulirang", tinggalSekarang: BL }),
+        h("Ria Agustina", "P", { tempatLahir: BL, tinggalSekarang: BL }),
+        h("Abdul Rahman Agustian", "L", { tempatLahir: "Karangan", tinggalSekarang: BL }),
+        h("Muhammad Rahmi Bagus Setiawan", "L", { tempatLahir: "Kutai Timur", tinggalSekarang: BL })
+      ]})
+    ]}),
+    h("Saninah", null, { anak: [
+      h("Muhammad Abirosan", "L", { tempatLahir: "Muara Bulan" }),
+      h("Sabir", "L", { tempatLahir: "Muara Bulan" })
+    ]}),
+    h("Narti", null, { anak: [
+      h("Airil", "L", { tempatLahir: BL }),
+      h("Fajariah", "P", { tempatLahir: BL }),
+      h("Sahira", "P", { tempatLahir: BL })
+    ]}),
+    h("Muhammad Kurnain", "L", { tempatLahir: "Mukti Lestari", tinggalSekarang: BL })
+  ]})
+]});
+
+/* --- Anak Bahar dengan istri kedua, Sorong --- */
+const ANAK_BAHAR_SORONG = [
+  hsd("Bahrun", "L", { id: "bahrun", anakKe: 1, pasangan: [
+    { ref: "hamidah", anak: [
+      w("Matius", "L", { anakKe: 1, tempatLahir: SD, makam: { nama: "Seberang 1" }, catatan: "Wafat usia balita" }),
+      hsd("Hartina", "P", { anakKe: 2, pasangan: [
+        u("Erdi", "L", { anak: [ hsd("Verby", "P", { anakKe: 1 }), hsd("Vera", "P", { anakKe: 2 }) ] })
+      ]}),
+      hsd("Lamri", "L", { anakKe: 3 }),
+      hsd("Supian", "L", { anakKe: 4 }),
+      hsd("Sari Kristiani", "P", { anakKe: 5 }),
+      w("Mikael", "L", { anakKe: 6, tempatLahir: SD, catatan: "Wafat saat dilahirkan" })
+    ]}
+  ]}),
+  hsd("Udin", "L", { anakKe: 2, pasangan: [
+    { ref: "jumariah", anak: [
+      h("Amat", "L", { anakKe: 1, tempatLahir: SD, tinggalSekarang: "PPU" }),
+      hsd("Pendi", "L", { anakKe: 2 }),
+      hsd("Riyan", "L", { anakKe: 3 }),
+      hsd("Rio", "L", { anakKe: 4 }),
+      hsd("Linda", "P", { anakKe: 5 })
+    ]}
+  ]}),
+  h("Siah", "P", { anakKe: 3, tempatLahir: SD, tinggalSekarang: ST,
+    pasangan: [
+      u("Mansyah", "L", { anak: [
+        h("Narko", "L", { anakKe: 1, tempatLahir: SL, dibesarkan: SL, tinggalSekarang: ST, pasangan: [
+          u("Leni Angriani", "P", { anak: [
+            w("Aura Adiba Azahra", "P", { anakKe: 1, tempatLahir: ST, makam: { nama: "Susuk Tengah/Oong" } }),
+            h("M. Adzan", "L", { anakKe: 2, tempatLahir: "Sangatta", tinggalSekarang: ST })
+          ]})
+        ]}),
+        w("Tika", "P", { anakKe: 2, tempatLahir: "Sungai Layu", makam: { nama: "Susuk Tengah/Oong" } }),
+        w("Herwin", "L", { anakKe: 3, tempatLahir: ST, makam: { nama: "Susuk Tengah/Oong" } }),
+        h("Jubay", "P", { anakKe: 4, tempatLahir: SL, dibesarkan: SL, tinggalSekarang: ST }),
+        w("Gunawan", "L", { anakKe: 5, tempatLahir: ST, makam: { nama: "Susuk Tengah/Oong" } }),
+        h("Masrah", "P", { anakKe: 6, tempatLahir: SL, dibesarkan: SL, tinggalSekarang: ST }),
+        h("Fitri", "P", { anakKe: 7, tempatLahir: SL, dibesarkan: SL, tinggalSekarang: ST }),
+        h("M. Aidil", "L", { alias: "Fadil", anakKe: 8, tempatLahir: SL, dibesarkan: SL, tinggalSekarang: ST }),
+        h("Jasmiah", "P", { anakKe: 9, tempatLahir: SL, tinggalSekarang: ST })
+      ]})
+    ]}),
+  h("Rosiana Nurisa", "P", { alias: "Isah", anakKe: 4, tempatLahir: SD, tinggalSekarang: SAPAM, pasangan: [
+    u("Wilhelmus Darmid", "L", { alias: "Darmi", anak: [
+      w("Epi", "L", { anakKe: 1, catatan: "Wafat usia dewasa" }),
+      h("Polikalmus Pranoto", "L", { alias: "Pran", anakKe: 2, tempatLahir: "Berau", tinggalSekarang: SAPAM }),
+      h("Munika Nurpita", "P", { alias: "Vita", anakKe: 3, tinggalSekarang: SAPAM, pasangan: [
+        u("Oktavianus Ade Sang Openg", "L", { anak: [
+          h("Alexander Chester Openg", "L", { anakKe: 1, tempatLahir: "Berau", domisili: "Bumi Jaya/Talisayan", tinggalSekarang: SAPAM })
+        ]})
+      ]})
+    ]}),
+    u("Arin", "L", { anak: [
+      h("Ardiansyah Arnu", "L", { anakKe: 1, tempatLahir: "Berau", domisili: AMBP, tinggalSekarang: SAPAM }),
+      h("Maria Okthavirra Marsilisiana", "P", { anakKe: 2, tempatLahir: "Berau", domisili: AMBP, tinggalSekarang: SAPAM })
+    ]})
+  ]}),
+  h("Jamal", "L", { anakKe: 5, tempatLahir: SD, tinggalSekarang: BLD, pasangan: [
+    u("Irus", "P", { anak: [
+      h("Nadi", "L", { anakKe: 1, tempatLahir: BLD, tinggalSekarang: BLD }),
+      h("Jimil", "L", { anakKe: 2, tempatLahir: BLD, tinggalSekarang: BLD }),
+      h("Bayu", "L", { anakKe: 3, tempatLahir: BLD, tinggalSekarang: BLD })
+    ]})
+  ]})
+];
+
+const GANTIHAN = w("Gantihan", "P", { id: "gantihan", anakKe: 2, tempatLahir: "Lemuang", dibesarkan: "Lemuang", pasangan: [
+  u("Buang", "L", { panggilan: "Terbis", anak: [
+
+    /* ===== Nanang ===== */
+    w("Nanang", "L", { id: "nanang", anakKe: 1, tempatLahir: "Lemuang", dibesarkan: "Lemuang", pasangan: [
+      u("Ganding", "P", { anak: [
+        w("Bahar", "L", { id: "bahar", alias: "Juwiti", anakKe: 1, tempatLahir: SD, pasangan: [
+          { ref: "jaena", anak: [ SIMAH ] },
+          { ref: "sorong", anak: ANAK_BAHAR_SORONG }
+        ]}),
+        w("Jamiah", "P", { anakKe: 2, makam: { nama: "Umum Datar" }, catatan: "Wafat usia lanjut", pasangan: [
+          u("Siur", "L", { anak: [
+            hsd("Abd. Basir", "L", { anakKe: 1, pasangan: [
+              u("Imur", "P", { anak: [
+                h("Dei", "P", { anakKe: 1, tempatLahir: SD, dibesarkan: SD, domisili: "Kerayaan", tinggalSekarang: SD, pasangan: [
+                  u("Isap", "L", { anak: [
+                    h("Nuraini", "P", { anakKe: 1, tempatLahir: SD, tinggalSekarang: "Kerayaan" }),
+                    h("Riski Sahbudi", "L", { anakKe: 2, tempatLahir: "Kerayaan", tinggalSekarang: SD }),
+                    h("Riska Sadaria", "P", { anakKe: 3, tempatLahir: "Kerayaan", tinggalSekarang: "Kerayaan" })
+                  ]})
+                ]}),
+                w("Supardi", "L", { tempatLahir: SD, makam: { nama: "Umum Datar" }, catatan: "Wafat usia 4,5 bulan" }),
+                hsd("Hikma", "P", { alias: "Dina", anakKe: 2 }),
+                hsd("Rahmat", "L", { anakKe: 3 })
+              ]})
+            ]}),
+            h("Itong", "L", { anakKe: 2, tempatLahir: SD, tinggalSekarang: BLD, pasangan: [
+              u("Jik/Minah", "P", { anak: [
+                h("Baharudin", "L", { anakKe: 1, tempatLahir: BLD, tinggalSekarang: BLD }),
+                h("Rahma", "P", { anakKe: 2, tempatLahir: BLD, tinggalSekarang: BLD }),
+                h("Rasma", "P", { anakKe: 3, tempatLahir: BLD, tinggalSekarang: BLD }),
+                h("Bayu", "L", { anakKe: 4, tempatLahir: BLD, tinggalSekarang: BLD }),
+                h("Tari", "P", { anakKe: 5, tempatLahir: BLD, tinggalSekarang: BLD }),
+                h("Topan", "L", { anakKe: 6, tempatLahir: BLD, tinggalSekarang: BLD }),
+                h("Avifah", "P", { anakKe: 7, tempatLahir: BLD, tinggalSekarang: BLD })
+              ]})
+            ]})
+          ]}),
+          u("Jiwa", "L", { anak: [
+            h("Delia", "P", { alias: "Ati", anakKe: 1, tempatLahir: SD, dibesarkan: "Susuk", tinggalSekarang: SD, pasangan: [
+              u("Acin", "L", { anak: [
+                hsd("Sukma Wati", "P", { anakKe: 1 }),
+                hsd("Sikna Astuti", "P", { anakKe: 2 }),
+                hsd("Shela Ramadan", "P", { anakKe: 3 })
+              ]})
+            ]})
+          ]})
+        ]})
+      ]})
+    ]}),
+
+    /* ===== Kidang ===== */
+    w("Kidang", "P", { id: "kidang", anakKe: 2, tempatLahir: "Lemuang", catatan: "Wafat usia lanjut. Tercatat punya 18 anak.", pasangan: [
+      u("Cara", "L", { anak: [
+        w("Jalak", "L", { tidakBeranak: true, anakKe: 1, makam: { nama: "Seberang 2" }, catatan: "Wafat usia lanjut" }),
+        w("Kingkinan", "P", { anakKe: 2, tidakBeranak: true }),
+        w("Sorong", "P", { id: "sorong", anakKe: 3 }),
+        w("Siu", "L", { id: "siu", anakKe: 4, catatan: "Wafat usia lanjut. Tercatat punya 13 anak.",
+          pasangan: [
+            { ref: "riyahan", anak: [
+              w("Jais", "L", { tempatLahir: "Sapinang" }),
+              w("Jenah", "P", { tempatLahir: "Sapinang", makam: { nama: "Mesjid" } }),
+              hsd("Ispran", "L", { alias: "Klik", anakKe: 2,
+                pasangan: [
+                  u("Norna", "P", { anak: [
+                    w("M. Haidir", "L", { anakKe: 1, tempatLahir: SD, makam: { nama: "Erdi" } }),
+                    w("Misrah", "L", { anakKe: 2, tempatLahir: "Susuk", makam: { nama: "Tanjung SL/SDL" } }),
+                    hsd("Aris Munandar", "L", { alias: "Aris", anakKe: 3 }),
+                    hsd("Risdayanti", "P", { alias: "Firda", anakKe: 4, pasangan: [
+                      u("Albar", "L", { anak: [ h("Ojak", "L", { anakKe: 1, tinggalSekarang: SD }) ] })
+                    ]}),
+                    hsd("Sandi", "L", { anakKe: 5 }),
+                    hsd("Eka", "P", { anakKe: 6 })
+                  ]}),
+                  u("Darmawati", "P", { alias: "Darna", anak: [
+                    h("Najwa Alyatul Siddiq", "P", { alias: "Nazwa", anakKe: 1, tempatLahir: "Kutai Timur", tinggalSekarang: SD })
+                  ]})
+                ]}),
+              h("Norna", "P", { alias: "Nornah", anakKe: 3, tempatLahir: SD, dibesarkan: SD, tinggalSekarang: SD, pasangan: [
+                u("Parno", "L", { anak: [
+                  h("Suyanti", "P", { alias: "Anti", anakKe: 1, tempatLahir: SD, tinggalSekarang: "Sulbar", pasangan: [
+                    u("M. Nur Sidik Ass\u2019ad", "L", { anak: [
+                      h("M. Fatih Al-Haliq", "L", { anakKe: 1, tempatLahir: "Sulbar", tinggalSekarang: "Sulbar" }),
+                      h("Zayn Firdauz", "L", { anakKe: 2, tempatLahir: "Sulbar", tinggalSekarang: "Sulbar" })
+                    ]})
+                  ]}),
+                  hsd("Arya Panbudi", "L", { alias: "Budi", anakKe: 2 })
+                ]})
+              ]}),
+              hsd("Aminudin", "L", { alias: "Ijur", anakKe: 4, pasangan: [
+                u("Sanawiah", "P", { anak: [ h("Zahra", "P", { anakKe: 1, tinggalSekarang: SD }) ] })
+              ]}),
+              h("Mariani", "P", { alias: "Mari", tempatLahir: SD, dibesarkan: SD, tinggalSekarang: "Sulbar", pasangan: [
+                u("Supangat", "L", { anak: [
+                  h("Ridwan", "L", { tempatLahir: "Mamuju", dibesarkan: "Sulbar", tinggalSekarang: "Sulbar" }),
+                  h("Ayu Lestari", "P", { tempatLahir: "Mamuju", dibesarkan: "Sulbar", tinggalSekarang: "Sulbar" })
+                ]})
+              ]}),
+              h("Petrus", "L", { alias: "Apit", tempatLahir: SD, dibesarkan: "Bontang", tinggalSekarang: "Rimba Hijau" }),
+              h("Kasnah", "P", { tempatLahir: SD, dibesarkan: SD, tinggalSekarang: "Pengadan",
+                pasangan: [
+                  u("Qyak", "L", { anak: [ h("Ahmad Sidik", "L", { tempatLahir: "Mamuju", tinggalSekarang: "Sulbar" }) ] }),
+                  u("Arman", "L", { anak: [ h("Nurjuita", "P", { tempatLahir: "Pengadan", tinggalSekarang: "Pengadan" }) ] }),
+                  u("Nanang Suriansyah", "L", { anak: [ h("Lita Amalia", "P", { tempatLahir: "Pengadan", tinggalSekarang: "Pengadan" }) ] })
+                ]})
+            ]}
+          ],
+          anak: [
+            w("Maria", "P", { makam: { nama: "Cil Sidah" } }),
+            w("Yatini", "P", { makam: { nama: "Keham Plasma" } })
+          ]}),
+        w("Balok", "P", { anakKe: 5, tidakBeranak: true }),
+        w("Mintol", "L", { anakKe: 6, tidakBeranak: true }),
+        w("Taktik", "P", { id: "taktik", anakKe: 7 }),
+        w("Lempak", "L", { anakKe: 8, tidakBeranak: true }),
+        w("Isam", "P", { anakKe: 9, pasangan: [
+          u("Burhan", "L", { anak: [
+            hsd("Suriansyah", "L", { anakKe: 1, pasangan: [
+              u("Tintin", "P", { anak: [
+                w("Gabriel", "L", { anakKe: 1, tempatLahir: "Semarang", makam: { nama: "Semarang" } }),
+                h("Dwitama", "L", { anakKe: 2, tempatLahir: "Sangatta", tinggalSekarang: "Muara Ancalong" })
+              ]})
+            ]}),
+            w("Rohani", "P", { anakKe: 2, pasangan: [
+              u("Mus Mulyadi", "L", { anak: [
+                h("Santi", "P", { anakKe: 1, tempatLahir: SD, tinggalSekarang: SMD }),
+                hsd("Lusi", "P", { anakKe: 2 }),
+                hsd("Uci", "P", { anakKe: 3 }),
+                hsd("Wahyu", "L", { anakKe: 4 })
+              ]})
+            ]})
+          ]})
+        ]}),
+        h("Embit", "L", { alias: "Lembu", tidakBeranak: true, anakKe: 10, tempatLahir: SD, tinggalSekarang: "Tadoan" }),
+        w("Iar", "P", { anakKe: 11, makam: { nama: "Seberang 1" },
+          pasangan: [
+            u("Guang", "L", { anak: [
+              h("Salbiyah", "P", { anakKe: 1, tempatLahir: SD, tinggalSekarang: AMBP, pasangan: [
+                u("Hamid Mirwansyah", "L", { anak: [
+                  h("Ahmad Supianur", "P", { anakKe: 1, tempatLahir: SD, tinggalSekarang: AMBP }),
+                  h("Sarah", "P", { anakKe: 2, tempatLahir: SD, tinggalSekarang: AMBP, pasangan: [
+                    u("Heriansyah", "L", { anak: [
+                      h("Risma Wandah", "P", { anakKe: 1, tempatLahir: "Berau", tinggalSekarang: AMBP }),
+                      h("Muhammad Wandyansyah", "L", { anakKe: 2, tempatLahir: "Berau", tinggalSekarang: AMBP })
+                    ]})
+                  ]}),
+                  h("Salina Pinarti", "P", { anakKe: 3, tempatLahir: "Kutai Timur", tinggalSekarang: AMBP }),
+                  h("Muhammad Irwansyah", "L", { anakKe: 4, tempatLahir: "Sapinang", tinggalSekarang: AMBP })
+                ]})
+              ]}),
+              h("Sinariyah", "P", { anakKe: 2, tempatLahir: SD, tinggalSekarang: AMBP, pasangan: [
+                u("Lambertus Kampil", "L", { anak: [
+                  h("Lastriyana", "P", { anakKe: 1, tempatLahir: SD, tinggalSekarang: AMBP, pasangan: [
+                    u("Vivaldus Bain", "L", { anak: [
+                      h("Devaldus Windi", "L", { anakKe: 1, tempatLahir: "Berau", tinggalSekarang: AMBP }),
+                      h("Septy Wilyana", "P", { anakKe: 2, tempatLahir: "Berau", tinggalSekarang: AMBP })
+                    ]})
+                  ]}),
+                  h("Darmansah", "L", { anakKe: 2, tempatLahir: "Ampen Medang", tinggalSekarang: AMBP, pasangan: [
+                    u("Santi", "P", { anak: [ h("Rahmansyah", "L", { anakKe: 1, tempatLahir: "Berau", tinggalSekarang: AMBP }) ] })
+                  ]}),
+                  h("Kalmansyah", "L", { anakKe: 3, tempatLahir: "Berau", tinggalSekarang: AMBP }),
+                  h("Sariyana", "P", { anakKe: 4, tempatLahir: "Berau", tinggalSekarang: AMBP, pasangan: [
+                    u("Pentrianus Tangdibali", "L", { anak: [ h("Elora Chrishtabel", "P", { anakKe: 1, tempatLahir: "Berau", tinggalSekarang: AMBP }) ] })
+                  ]})
+                ]})
+              ]}),
+              h("Kaharudin", "L", { anakKe: 3, tempatLahir: SD, domisili: SD, tinggalSekarang: SD,
+                pasangan: [
+                  u("Kamariah", "P", { anak: [
+                    h("Muhammad Dikir", "L", { anakKe: 1, tempatLahir: SD, domisili: SD, tinggalSekarang: SD }),
+                    h("Saripudin Nur", "L", { anakKe: 2, tempatLahir: ST, domisili: SD, tinggalSekarang: SD }),
+                    h("Sarina Siska", "P", { anakKe: 3, tempatLahir: SD, domisili: SD, tinggalSekarang: SD })
+                  ]})
+                ]}),
+              h("Imus", "L", { anakKe: 4, tempatLahir: SD, tinggalSekarang: SAPAM }),
+              h("Agus", "L", { anakKe: 5, tempatLahir: SD, tinggalSekarang: BLD, anak: [
+                h("Safnah", "P", { anakKe: 1, tempatLahir: BLD, tinggalSekarang: BLD }),
+                h("Safitri", "P", { anakKe: 2, tempatLahir: BLD, tinggalSekarang: BLD })
+              ]}),
+              hsd("Marten", "L", { anakKe: 6, pasangan: [
+                u("Indah", "P", { anak: [ hsd("Rian", "L", { anakKe: 1 }), hsd("Fatma", "P", { anakKe: 2 }) ] })
+              ]}),
+              h("Ninus", "L", { anakKe: 7, tempatLahir: SD, tinggalSekarang: "Sungai Merah", anak: [
+                h("Wanda", "P", { anakKe: 1, tempatLahir: "Sungai Merah", tinggalSekarang: "Sungai Merah" }),
+                nn({ jk: "L", anakKe: 2, wafat: false, tempatLahir: "Sungai Merah", tinggalSekarang: "Sungai Merah" })
+              ]}),
+              h("Nita", "P", { anakKe: 8, tempatLahir: SD, tinggalSekarang: "Rimba Hijau", pasangan: [
+                u("Nur", "L", { anak: [
+                  h("Aivy", "P", { anakKe: 1, tempatLahir: SD, tinggalSekarang: "Rimba Hijau" }),
+                  h("Nurhalifah", "L", { anakKe: 2, tempatLahir: "Sulawesi", tinggalSekarang: "Rimba Hijau" }),
+                  nn({ anakKe: 3, wafat: false, tinggalSekarang: "Rimba Hijau" })
+                ]})
+              ]})
+            ]}),
+            u("Bilai", "L", { anak: [
+              h("Kapten", "L", { alias: "Ikap", anakKe: 1, tempatLahir: SD, domisili: AMBP, tinggalSekarang: SAPAM })
+            ]})
+          ]}),
+        hsd("Rapiah", "P", { anakKe: 12,
+          pasangan: [
+            u("Kiloan", "L", { anak: [
+              w("Mili", "P", { makam: { nama: "Sangatta" }, pasangan: [
+                u("Albert", "L", { anak: [
+                  h("Putri", "P", { anakKe: 1, tempatLahir: SD, tinggalSekarang: "Sulteng" }),
+                  h("Meri", "P", { anakKe: 2, tempatLahir: SD, tinggalSekarang: "Sulteng" })
+                ]})
+              ]})
+            ]})
+          ],
+          anak: [
+            hsd("Ignasius Ibak", "L", { pasangan: [
+              u("Rohana", "P", { anak: [
+                h("Maria Ima Colata", "P", { anakKe: 1, tempatLahir: "Tenggarong", tinggalSekarang: SD }),
+                hsd("Yohanis Lamba", "L", { anakKe: 2 }),
+                hsd("Magdalena", "P", { anakKe: 3 })
+              ]})
+            ]}),
+            w("Mila", "P", { makam: { nama: "Susuk/Sungai Lukan" } }),
+            w("Puya", "L", { makam: { nama: "Susuk/S. Gereja" } }),
+            w("Yunda", "L", { makam: { nama: "Susuk/S. Gereja" } })
+          ]}),
+        hsd("Sapri", "L", { anakKe: 13, pasangan: [
+          u("Rina", "P", { anak: [
+            h("Mira", "P", { anakKe: 1, tempatLahir: "Lubang Klatak/Batu Putih", dibesarkan: "Susuk", domisili: SD, pasangan: [
+              u("Ipul", "L", { anak: [ h("Ardi", "L", { anakKe: 1, tempatLahir: "BMA" }) ] })
+            ]}),
+            h("Hendri", "L", { anakKe: 2, tempatLahir: "Lubang Klatak/Batu Putih", dibesarkan: "Susuk", domisili: "Marukangan", tinggalSekarang: BLD, pasangan: [
+              u("Jurai", "P", { anak: [ h("Rahel", "P", { anakKe: 1, tempatLahir: BLD, tinggalSekarang: BLD }) ] })
+            ]}),
+            h("Andri", "L", { anakKe: 3, tempatLahir: "Talisayan", dibesarkan: "Susuk", domisili: SD, tinggalSekarang: SD }),
+            h("Yungki", "L", { anakKe: 4, tempatLahir: "Lubang Klatak/Batu Putih", dibesarkan: "Susuk", domisili: SD, tinggalSekarang: SD }),
+            w("Hendra", "L", { anakKe: 5, tempatLahir: SD, makam: { nama: "Mesjid" }, catatan: "Wafat usia 6 bulan" }),
+            h("Yanda", "L", { anakKe: 6, tempatLahir: SD, dibesarkan: "Susuk", domisili: SD, tinggalSekarang: "Maloy (kerja)" }),
+            h("Beni", "L", { anakKe: 7, tempatLahir: SD, dibesarkan: "Susuk", domisili: SD, tinggalSekarang: SD }),
+            w("Windi", "P", { anakKe: 8, tempatLahir: SD, makam: { nama: "Samping Kiloan" }, catatan: "Wafat usia 1 hari" }),
+            h("Bayu", "L", { anakKe: 9, tempatLahir: SD, domisili: SD, tinggalSekarang: SD }),
+            hsd("Risva", "P", { alias: "Eva", anakKe: 10 }),
+            hsd("Winda", "P", { anakKe: 11 })
+          ]})
+        ]})
+      ]})
+    ]}),
+
+    /* ===== Wiwik ===== */
+    w("Wiwik", "P", { id: "wiwik", anakKe: 3, tempatLahir: "Lemuang", pasangan: [
+      u("Rida", "L", { anak: [
+        w("Munah", "P", { anakKe: 1, pasangan: [
+          u("Tawar", "L", { anak: [
+            hsd("Sidah", "P", { id: "sidah", anakKe: 1 }),
+            hsd("Raudah", "P", { anakKe: 2,
+              pasangan: [
+                u("Syahroni", "L", { anak: [
+                  w("Ratna", "P", { tempatLahir: SD, makam: { nama: "Susuk/Tanjung SL" } }),
+                  hsd("Fitriana", "P", { anakKe: 1, pasangan: [
+                    u("Mario", "L", { anak: [ hsd("Rahel", "P", { anakKe: 1 }) ] })
+                  ]}),
+                  w("Zulkipli", "L", { tempatLahir: SD, makam: { nama: "Susuk/Tanjung SL" } }),
+                  h("Istania", "P", { anakKe: 2, tempatLahir: SD, domisili: ST, tinggalSekarang: SD, pasangan: [
+                    u("Sandi", "L", { anak: [
+                      h("Winda Aprilia", "P", { anakKe: 1, tempatLahir: ST, tinggalSekarang: SD }),
+                      hsd("Muhammad Azriel", "L", { anakKe: 2 })
+                    ]})
+                  ]}),
+                  w("Bunga", "P", { makam: { nama: "Mesjid" }, catatan: "Lahir prematur" }),
+                  hsd("Muhammad Rivan", "L", { anakKe: 3 })
+                ]})
+              ]}),
+            hsd("Anwar", "L", { anakKe: 3, pasangan: [
+              u("Samijah", "P", { anak: [
+                h("Rahma", "P", { anakKe: 1, dibesarkan: SD, tinggalSekarang: SD, anak: [
+                  h("Afifah", "P", { anakKe: 1, tinggalSekarang: SD })
+                ]}),
+                h("Ida", "P", { anakKe: 2, dibesarkan: SD, tinggalSekarang: SD }),
+                h("Ipan", "L", { anakKe: 3, dibesarkan: SD, tinggalSekarang: SD })
+              ]}),
+              u("Suryani", "P", { anak: [
+                hsd("Dedi", "L", { anakKe: 1 })
+              ]}),
+              u("(nama belum dicatat)", "P", { anak: [
+                h("Dea", "P", { anakKe: 1, tempatLahir: "Sangatta", tinggalSekarang: "Sangatta" })
+              ]})
+            ]})
+          ]}),
+          u("Siman", "L", { anak: [
+            h("Usman", "L", { anakKe: 1, tinggalSekarang: "Kerayaan", anak: [
+              h("Leni", "P", { anakKe: 1 }),
+              h("Niken", "P", { anakKe: 2 }),
+              nn({ anakKe: 3, wafat: false })
+            ]})
+          ]}),
+          u("Nuning", null, { anak: [
+            h("Normansyah", "L", { anakKe: 1, tinggalSekarang: SD, pasangan: [
+              u("Mardiana", "P", { anak: [ h("Dian", null, { anakKe: 1, tinggalSekarang: SD }) ] })
+            ]}),
+            h("Syahlina", "P", { anakKe: 2, tinggalSekarang: SD, pasangan: [
+              u("Suhardi", "L", { anak: [
+                h("Ari Anggara", "L", { dibesarkan: SD, tinggalSekarang: SD }),
+                h("Nia Harlini", "P", { dibesarkan: SD, tinggalSekarang: SD }),
+                h("Rachmat Afandi", "L", { dibesarkan: SD, tinggalSekarang: SD }),
+                h("Muhammad Arien", "L", { dibesarkan: SD, tinggalSekarang: SD }),
+                h("Mia Andini", "P", { dibesarkan: SD, tinggalSekarang: SD }),
+                w("M. Alfatih", "L", { makam: { nama: "Susuk/Tanjung SL" }, catatan: "Wafat saat dilahirkan" })
+              ]})
+            ]})
+          ]})
+        ]}),
+        w("Sabrin", "L", { id: "sabrin", anakKe: 2, pasangan: [
+          { ref: "taktik", anak: [
+            h("Hamidah", "P", { id: "hamidah", anakKe: 1, tempatLahir: SD, dibesarkan: SD, domisili: SD, tinggalSekarang: SD }),
+            h("Mardiana", "P", { alias: "Imar", anakKe: 2, tempatLahir: SD, dibesarkan: SD, tinggalSekarang: "Papua Barat", pasangan: [
+              u("Fran", "L", { alias: "Peran", anak: [
+                h("Valentino", "L", { alias: "Valen", anakKe: 1, tempatLahir: "Jakarta", dibesarkan: SMD, domisili: SMD, tinggalSekarang: SMD })
+              ]})
+            ]}),
+            h("Ismail", "L", { alias: "Mail", anakKe: 3, tempatLahir: SD, dibesarkan: SD, domisili: SD, tinggalSekarang: SD, pasangan: [
+              u("Hasnia", "P", { anak: [
+                h("Nur Selviana", "P", { alias: "Viana", anakKe: 1, tempatLahir: "Sungai Merah", dibesarkan: "PT Sinergi", domisili: SD, tinggalSekarang: SD })
+              ]})
+            ]}),
+            h("Anita", "P", { alias: "Yani", anakKe: 4, tempatLahir: SD, domisili: LKBP, tinggalSekarang: KLK, pasangan: [
+              u("Donatus Ridwan", "L", { alias: "Duan", anak: [
+                w("Doris", "L", { anakKe: 1, catatan: "Wafat usia dewasa" }),
+                w("Minah", "P", { anakKe: 2, catatan: "Wafat usia dewasa" }),
+                h("Melda", "P", { anakKe: 3, tempatLahir: "Berau", domisili: LKBP, tinggalSekarang: KLK, pasangan: [
+                  u("Aditia Rahman", "L", { anak: [
+                    h("Azzahra Riskya Nur Hidayah", "P", { alias: "Zara", anakKe: 1, tempatLahir: "Berau", domisili: LKBP, tinggalSekarang: "Balikpapan" })
+                  ]}),
+                  u("Muh Ari Wijaya", "L", { anak: [
+                    h("Athifa Qirani Wijaya", "P", { anakKe: 2, tempatLahir: "Lobang Klatak", domisili: LKBP, tinggalSekarang: KLK })
+                  ]})
+                ]}),
+                h("Martadinata", "P", { alias: "Marta", anakKe: 4, tempatLahir: "Berau", domisili: "Capuak/Talisayan", tinggalSekarang: KLK, pasangan: [
+                  u("Robi Darwis", "L", { anak: [
+                    h("Arkana Raffasya Darwis", "L", { anakKe: 1, tempatLahir: "Berau", domisili: "Capuak/Talisayan", tinggalSekarang: KLK })
+                  ]})
+                ]}),
+                h("Fransiska Yulianto", "L", { alias: "Fran, Pran", anakKe: 5, tempatLahir: "Berau", domisili: LKBP, tinggalSekarang: KLK }),
+                h("Margaretta Amilliyani", "P", { alias: "Rema", anakKe: 6, tempatLahir: "Berau", domisili: LKBP, tinggalSekarang: KLK })
+              ]})
+            ]}),
+            w("Ati", "P", { anakKe: 5 })
+          ]}
+        ]}),
+        w("Riyahan", "P", { id: "riyahan", anakKe: 3 })
+      ]})
+    ]})
+  ]})
+]});
+
+const DATA = [
+  { nama: "Orang tua Kunggit & Gantihan", placeholder: true, tempatLahir: "Lemuang",
+    catatan: "Nama belum dicatat. Kunggit (kakak) dan Gantihan (adik) adalah saudara kandung.",
+    anak: [ KUNGGIT, GANTIHAN ] }
+];
+
+/* ---------- Persiapan data ---------- */
+const byId = {};
+const allNodes = [];
+
+function prep(n, parent, union, depth) {
+  n.parent = parent || null;
+  n.parentUnion = union || null;
+  n.depth = depth;
+  n.linked = [];
+  if (n.id) {
+    if (byId[n.id]) console.warn("id dipakai dua kali:", n.id);
+    byId[n.id] = n;
+  }
+  allNodes.push(n);
+  let ps = n.pasangan || [];
+  if (!Array.isArray(ps)) ps = [ps];
+  n.unions = ps.map((s, i) => {
+    const un = { no: i + 1, owner: n, ref: s.ref || null, spouse: s.ref ? null : s, anak: s.anak || [], mirror: null };
+    if (!s.ref) { s.isSpouse = true; s.union = un; }
+    un.anak.forEach(c => prep(c, n, un, depth + 1));
+    return un;
+  });
+  n.anak = n.anak || [];
+  n.anak.forEach(c => prep(c, n, null, depth + 1));
+}
+DATA.forEach(n => prep(n, null, null, 0));
+
+allNodes.forEach(n => n.unions.forEach(un => {
+  if (!un.ref) return;
+  const t = byId[un.ref];
+  if (t) un.spouse = t;
+  else console.warn("ref tidak ditemukan:", un.ref, "pada", n.nama);
+}));
+allNodes.forEach(n => n.unions.forEach(un => {
+  if (!un.ref || !un.spouse || un.mirror) return;
+  const t = un.spouse;
+  const back = t.unions.find(v => v.ref && v.spouse === n);
+  if (back) { un.mirror = back; back.mirror = un; }
+  else t.linked.push(un);
+}));
+
+/* Daftar pasangan seseorang, termasuk yang anaknya tercatat di cabang suami. */
+function couples(n) {
+  const out = [];
+  n.unions.forEach(un => {
+    if (un.mirror && !un.anak.length && un.mirror.anak.length) {
+      out.push({ no: un.no, spouse: un.spouse, kids: un.mirror.anak, at: un.mirror.owner, isRef: true });
+    } else {
+      out.push({ no: un.no, spouse: un.spouse, kids: un.anak, at: null, isRef: !!un.ref });
+    }
+  });
+  n.linked.forEach((un, i) => out.push({ no: n.unions.length + i + 1, spouse: un.owner, kids: un.anak, at: un.owner, isRef: true }));
+  return out;
+}
+function ownCount(n) { return n.anak.length + couples(n).filter(c => !c.at).reduce((t, c) => t + c.kids.length, 0); }
+function elseCount(n) { return couples(n).filter(c => c.at).reduce((t, c) => t + c.kids.length, 0); }
+
+/* ---------- Nama dan hubungan ---------- */
+function almLabel(n) {
+  if (!n || n.wafat !== true) return "";
+  return n.jk === "P" ? "Almh." : "Alm.";
+}
+function fullName(n) {
+  if (!n) return null;
+  const a = almLabel(n);
+  return a ? n.nama + ", " + a : n.nama;
+}
+function husbandFirst(a, b) {
+  if (!b) return [a];
+  if (a.jk === "P" && b.jk !== "P") return [b, a];
+  return [a, b];
+}
+function coupleText(a, b) { return husbandFirst(a, b).map(fullName).join(" & "); }
+function coupleName(n) {
+  if (n.placeholder) return "orang tua Kunggit & Gantihan";
+  const cs = couples(n);
+  return cs.length === 1 && cs[0].spouse ? coupleText(n, cs[0].spouse) : fullName(n);
+}
+function jumlahAnak(k) { return k > 0 ? k + " anak" : "tidak ada anak"; }
+
+function ancestorAt(n, d) {
+  let x = n;
+  while (x && x.depth > d) x = x.parent;
+  return x && x.depth === d ? x : null;
+}
+function cabangName(n) {
+  if (!n || n.isSpouse) return "";
+  if (n.depth >= 3) return ancestorAt(n, 2).nama;
+  return n.nama;
+}
+function cabangLabel(n) {
+  if (n.isSpouse || n.depth < 2) return null;
+  const a1 = ancestorAt(n, 1);
+  if (n.depth === 2) return "Keturunan " + a1.nama;
+  return ancestorAt(n, 2).nama + " (keturunan " + a1.nama + ")";
+}
+
+const ANGKA = ["", "sekali", "dua kali", "tiga kali", "empat kali", "lima kali"];
+const BEDA = ["", "satu", "dua", "tiga", "empat"];
+function kinship(a, b) {
+  if (!a || !b || a.isSpouse || b.isSpouse) return null;
+  const da = new Map();
+  let x = a, i = 0;
+  while (x) { da.set(x, i); x = x.parent; i++; }
+  let y = b, j = 0;
+  while (y) {
+    if (da.has(y)) {
+      const p = da.get(y), q = j, m = Math.min(p, q), r = Math.abs(p - q);
+      let t;
+      if (m === 0) t = "garis lurus, beda " + (BEDA[r] || r) + " generasi";
+      else if (m === 1) t = r === 0 ? "saudara kandung" : "paman/bibi dan keponakan" + (r > 1 ? ", beda " + (BEDA[r] || r) + " generasi" : "");
+      else {
+        t = "sepupu " + (ANGKA[m - 1] || (m - 1) + " kali");
+        if (r) t += ", beda " + (BEDA[r] || r) + " generasi";
+      }
+      const cn = coupleName(y);
+      return t + ". Sama-sama keturunan " + cn + (cn.endsWith(".") ? "" : ".");
+    }
+    y = y.parent; j++;
+  }
+  return null;
+}
+
+function orangTua(n) {
+  let ayah = n.ayah || null, ibu = n.ibu || null;
+  if (n.isSpouse) return { ayah, ibu };
+  const p = n.parent;
+  if (p && !p.placeholder) {
+    const o = n.parentUnion ? n.parentUnion.spouse : null;
+    const other = o ? fullName(o) : null;
+    if (p.jk === "P") { ibu = ibu || fullName(p); ayah = ayah || other; }
+    else if (p.jk === "L") { ayah = ayah || fullName(p); ibu = ibu || other; }
+  }
+  return { ayah, ibu };
+}
+
+/* ---------- Helper DOM ---------- */
+function el(tag, attrs, ...kids) {
+  const e = document.createElement(tag);
+  if (attrs) for (const k in attrs) {
+    if (k === "class") e.className = attrs[k];
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), attrs[k]);
+    else e.setAttribute(k, attrs[k]);
+  }
+  kids.flat().forEach(c => { if (c != null && c !== false && c !== "") e.append(c); });
+  return e;
+}
+const chevron = () => {
+  const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  s.setAttribute("width", "12"); s.setAttribute("height", "12"); s.setAttribute("viewBox", "0 0 12 12");
+  s.setAttribute("aria-hidden", "true");
+  s.innerHTML = '<path d="M4 2l4 4-4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+  return s;
+};
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* Ketuk sekali: pop up. Ketuk dua kali: aksi kedua. */
+function onTaps(btn, single, double) {
+  let t = null;
+  btn.addEventListener("click", () => {
+    if (t) { clearTimeout(t); t = null; double(); return; }
+    t = setTimeout(() => { t = null; single(); }, 260);
+  });
+}
+
+/* ---------- Pohon ---------- */
+const nodeLi = new Map();
+
+function isOpen(li) { return li.classList.contains("open"); }
+function setOpen(li, open) {
+  const ul = li.querySelector(":scope > ul.branch");
+  const tg = li.querySelector(":scope > .row .toggle");
+  if (!ul) return;
+  ul.hidden = !open;
+  li.classList.toggle("open", open);
+  if (tg) tg.setAttribute("aria-expanded", String(open));
+}
+
+function jump(target, openIt) {
+  let x = target.parent;
+  while (x) { const l = nodeLi.get(x); if (l) setOpen(l, true); x = x.parent; }
+  const li = nodeLi.get(target);
+  if (!li) return;
+  if (openIt) setOpen(li, true);
+  const row = li.querySelector(":scope > .row");
+  row.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
+  row.classList.remove("flash"); void row.offsetWidth; row.classList.add("flash");
+  const nb = row.querySelector(".name");
+  if (nb) nb.focus({ preventScroll: true });
+}
+
+function secondary(n) {
+  const li = nodeLi.get(n);
+  if (ownCount(n) > 0 && li) { setOpen(li, !isOpen(li)); return; }
+  const c = couples(n).find(x => x.at && x.kids.length);
+  if (c) jump(c.at, true);
+  else openDetail(n);
+}
+
+function nameParts(n) {
+  return [n.nama, n.jk ? el("span", { class: "jk" }, "(" + n.jk + ")") : null,
+          n.wafat === true ? el("span", { class: "alm" }, almLabel(n)) : null];
+}
+function nameButton(n) {
+  const b = el("button", { type: "button", class: n.belumBernama ? "name unnamed" : "name" }, nameParts(n));
+  onTaps(b, () => openDetail(n), () => secondary(n));
+  return b;
+}
+function spouseButton(c) {
+  const s = c.spouse;
+  if (!s) return el("span", { class: "glabel unknown" }, "(tidak ditemukan)");
+  const b = el("button", { type: "button", class: "spouse" }, nameParts(s));
+  onTaps(b, () => openDetail(s, { fromRef: c.isRef }), () => {
+    if (c.at) jump(c.at, true);
+    else if (c.isRef) jump(s, false);
+    else openDetail(s);
+  });
+  return b;
+}
+function jumpButton(c) {
+  return el("button", { type: "button", class: "jump", onclick: () => jump(c.at, true) }, "Lihat anak");
+}
+
+/* Keterangan kawin sepupu yang bisa diklik */
+function kinTag(n, c) {
+  const txt = c.at ? "kawin sepupu, anak di cabang " + cabangName(c.at) : "kawin sepupu";
+  return el("button", {
+    type: "button", class: "kin",
+    title: c.at ? "Lihat anak di cabang " + cabangName(c.at) : "Lihat pasangan",
+    onclick: () => { if (c.at) jump(c.at, true); else openDetail(c.spouse, { fromRef: true }); }
+  }, txt);
+}
+
+/* Pemisah pasangan (hanya bila pasangan lebih dari satu). Nama pasangan tidak ditulis. */
+function groupRow(n, label, c, kids) {
+  const li = el("li", { class: "group" });
+  const row = el("div", { class: "row" },
+    el("span", { class: "ring", "aria-hidden": "true" }),
+    el("span", { class: c ? "glabel" : "glabel unknown" }, label));
+  if (c && c.isRef && c.spouse) row.append(kinTag(n, c));
+  if (c && c.at) {
+    row.append(el("span", { class: "meta" }, "(" + jumlahAnak(c.kids.length) + ")"));
+  } else {
+    row.append(el("span", { class: "meta" }, "(" + jumlahAnak(kids.length) + ")"));
+  }
+  li.append(row);
+  if (!(c && c.at) && kids.length) {
+    const ul = el("ul", { class: "branch kids" });
+    kids.forEach(k => ul.append(renderNode(k, false)));
+    li.append(ul);
+  }
+  return li;
+}
+
+function linkRow(c) {
+  return el("li", { class: "group" },
+    el("div", { class: "row" },
+      el("span", { class: "ring", "aria-hidden": "true" }),
+      el("span", { class: "meta" }, "Anak tercatat di cabang " + cabangName(c.at)),
+      jumpButton(c)));
+}
+
+function renderNode(n, root) {
+  const cs = couples(n);
+  const own = ownCount(n), ext = elseCount(n);
+  const has = own + ext > 0;
+  const li = el("li", { class: "node" + (root ? " root" : "") });
+  const row = el("div", { class: "row" });
+
+  if (has) {
+    row.append(el("button", {
+      type: "button", class: "toggle", "aria-expanded": "false",
+      "aria-label": "Buka atau tutup keturunan " + n.nama,
+      onclick: () => setOpen(li, !isOpen(li))
+    }, chevron()));
+  } else {
+    row.append(el("span", { class: "leaf", "aria-hidden": "true" }));
+  }
+
+  // KE-I ditulis berpasangan (suami lebih dulu); selebihnya hanya nama keturunan.
+  const nb = nameButton(n);
+  if (n.depth === 1 && cs.length === 1 && cs[0].spouse) {
+    const c = cs[0];
+    const sb = spouseButton(c);
+    const amp = el("span", { class: "amp" }, "&");
+    if (n.jk === "P" && c.spouse.jk !== "P") row.append(sb, amp, nb);
+    else row.append(nb, amp, sb);
+  } else {
+    row.append(nb);
+  }
+
+  if (own) {
+    row.append(el("span", { class: "meta" }, own + " anak"));
+  } else if (ext) {
+    row.append(el("span", { class: "meta" }, ext + " anak"));
+  } else if (n.tidakBeranak) {
+    row.append(el("span", { class: "meta" }, "tidak beranak"));
+  }
+
+  // Pemisah "Pasangan 1, 2, ..." hanya dipakai bila pasangan yang tercatat lebih dari satu.
+  const groups = cs.length;
+  if (n.depth >= 2 && groups <= 1) {
+    cs.filter(c => c.isRef && c.spouse).forEach(c => row.append(kinTag(n, c)));
+  }
+  li.append(row);
+
+  if (has) {
+    const ul = el("ul", { class: "branch" });
+    ul.hidden = true;
+    if (n.depth === 1 || groups <= 1) {
+      cs.forEach(c => {
+        if (c.at) { if (c.kids.length) ul.append(linkRow(c)); }
+        else c.kids.forEach(k => ul.append(renderNode(k, false)));
+      });
+      n.anak.forEach(k => ul.append(renderNode(k, false)));
+    } else {
+      cs.forEach(c => ul.append(groupRow(n, "Pasangan " + c.no, c, c.kids)));
+      if (n.anak.length) ul.append(groupRow(n, "Pasangan belum dicatat", null, n.anak));
+    }
+    li.append(ul);
+  }
+  nodeLi.set(n, li);
+  return li;
+}
+
+const tree = document.getElementById("tree");
+DATA.forEach(n => {
+  const li = renderNode(n, true);
+  tree.append(li);
+  setOpen(li, true);
+});
+document.getElementById("openAll").onclick = () => tree.querySelectorAll("li.node").forEach(li => setOpen(li, true));
+document.getElementById("closeAll").onclick = () => tree.querySelectorAll("li.node:not(.root)").forEach(li => setOpen(li, false));
+
+/* ---------- Detail (pop up) ---------- */
+const dlg = document.getElementById("detail");
+const dTitle = document.getElementById("dTitle");
+const dSub = document.getElementById("dSub");
+const dBody = document.getElementById("dBody");
+let map = null;
+
+function val(v) { return v ? v : el("span", { class: "empty" }, "Belum dicatat"); }
+function line(label, text) {
+  return el("div", { class: "line" }, label ? el("b", null, label + " ") : null, text);
+}
+function closeThen(fn) { dlg.close(); fn(); }
+
+function openDetail(n, opts) {
+  opts = opts || {};
+  dTitle.textContent = fullName(n);
+  const subs = [];
+  if (n.panggilan) subs.push("Dipanggil " + n.panggilan);
+  if (n.alias) subs.push("Dikenal juga sebagai " + n.alias);
+  if (n.isSpouse) subs.push("Pasangan ke-" + n.union.no + " dari " + fullName(n.union.owner));
+  dSub.textContent = subs.join(". ");
+  dSub.hidden = subs.length === 0;
+
+  const rows = [];
+  const cs = n.isSpouse ? [] : couples(n);
+
+  if (n.placeholder) {
+    rows.push(["Asal", n.tempatLahir]);
+    rows.push(["Anak", n.anak.map(fullName).join(", ")]);
+    rows.push(["Catatan", n.catatan]);
+  } else {
+    if (!n.isSpouse) {
+      rows.push(["Keturunan ke-", String(n.depth)]);
+      const cl = cabangLabel(n);
+      if (cl) rows.push(["Cabang", cl]);
+    }
+    rows.push(["Jenis kelamin", n.jk === "L" ? "Laki-laki" : n.jk === "P" ? "Perempuan" : null]);
+    rows.push(["Status", n.wafat === true ? "Sudah wafat" : n.wafat === false ? "Masih hidup" : null]);
+    if (n.tahunLahir) rows.push(["Tahun lahir", String(n.tahunLahir)]);
+    if (n.anakKe) rows.push(["Anak ke-", String(n.anakKe)]);
+
+    if (!n.isSpouse || n.ayah || n.ibu) {
+      const ot = orangTua(n);
+      rows.push(["Ayah", ot.ayah]);
+      rows.push(["Ibu", ot.ibu]);
+    }
+
+    // Pasangan
+    if (n.isSpouse) {
+      rows.push(["Pasangan", fullName(n.union.owner) + " (" + jumlahAnak(n.union.anak.length) + ")"]);
+    } else {
+      const box = el("div");
+      const multi = cs.length > 1;
+      cs.forEach(c => box.append(line(multi ? "Pasangan " + c.no + ":" : null,
+        (c.spouse ? fullName(c.spouse) : "?") + " (" + jumlahAnak(c.kids.length) + (c.at ? ", tercatat di cabang " + cabangName(c.at) : "") + ")")));
+      if (multi && n.anak.length) box.append(line("Pasangan belum dicatat:", "(" + jumlahAnak(n.anak.length) + ")"));
+      rows.push(["Pasangan", box.childNodes.length ? box : null]);
+      cs.filter(c => c.isRef && c.spouse).forEach(c => {
+        const k = kinship(n, c.spouse);
+        if (k) rows.push(["Hubungan dengan " + c.spouse.nama, k]);
+      });
+    }
+
+    rows.push(["Tempat lahir", n.tempatLahir]);
+    rows.push(["Tempat dibesarkan", n.dibesarkan]);
+    if (n.wafat === true) {
+      if (n.tinggalSekarang || n.domisili) rows.push(["Tempat tinggal terakhir", n.tinggalSekarang || n.domisili]);
+      rows.push(["Tempat wafat", n.tempatWafat]);
+      rows.push(["Makam", n.makam && n.makam.nama]);
+    } else {
+      rows.push(["Domisili", n.domisili]);
+      rows.push(["Tempat tinggal sekarang", n.tinggalSekarang]);
+    }
+
+    // Anak
+    if (n.isSpouse) {
+      rows.push(["Anak", n.union.anak.length ? n.union.anak.map(fullName).join(", ") : "Tidak ada anak"]);
+    } else {
+      const groups = [];
+      if (cs.length <= 1) {
+        const c = cs[0];
+        const kids = (c ? c.kids : []).concat(n.anak);
+        if (kids.length) groups.push([c && c.at ? "Tercatat di cabang " + cabangName(c.at) + ":" : null, kids]);
+      } else cs.filter(c => c.kids.length).forEach(c => {
+        const who = c.spouse ? c.spouse.nama : "?";
+        groups.push([c.at ? "Bersama " + who + " (tercatat di cabang " + cabangName(c.at) + "):" : "Dari " + who + ":", c.kids]);
+      });
+      if (cs.length > 1 && n.anak.length) groups.push(["Pasangan belum dicatat:", n.anak]);
+      if (!groups.length) {
+        rows.push(["Anak", n.tidakBeranak ? "Tidak beranak" : null]);
+      } else {
+        const box = el("div");
+        groups.forEach(([lbl, kids]) => box.append(line(lbl, kids.map(fullName).join(", "))));
+        rows.push(["Anak", box]);
+      }
+    }
+    if (n.catatan) rows.push(["Catatan", n.catatan]);
+  }
+
+  const dl = el("dl");
+  rows.forEach(([k, v]) => dl.append(el("dt", null, k), el("dd", null, val(v))));
+  if (n.konfirmasi) dl.append(el("dt", { class: "konf" }, "Perlu konfirmasi"), el("dd", { class: "konf" }, n.konfirmasi));
+  dBody.replaceChildren(dl);
+
+  // Makam dan peta
+  const m = n.makam;
+  const hasCoord = n.wafat === true && m && Number.isFinite(m.lat) && Number.isFinite(m.lng);
+  if (hasCoord) {
+    const coord = m.lat.toFixed(6) + ", " + m.lng.toFixed(6);
+    dBody.append(el("div", { class: "map-box" },
+      el("dl", null, el("dt", null, "Koordinat makam"), el("dd", null, coord)),
+      el("div", { class: "map", id: "mapBox", role: "img", "aria-label": "Peta lokasi makam " + n.nama }),
+      el("div", { class: "map-links" },
+        el("a", { href: "https://www.google.com/maps?q=" + m.lat + "," + m.lng, target: "_blank", rel: "noopener" }, "Buka di Google Maps"),
+        el("a", { href: "https://www.openstreetmap.org/?mlat=" + m.lat + "&mlon=" + m.lng + "#map=17/" + m.lat + "/" + m.lng, target: "_blank", rel: "noopener" }, "Buka di OpenStreetMap")
+      )
+    ));
+  }
+
+  // Tombol aksi
+  const acts = el("div", { class: "d-actions" });
+  if (!n.isSpouse && ownCount(n) > 0) {
+    acts.append(el("button", { type: "button", class: "primary", onclick: () => closeThen(() => jump(n, true)) }, "Tampilkan anak (" + ownCount(n) + ")"));
+  }
+  cs.filter(c => c.at && c.kids.length).forEach(c => {
+    acts.append(el("button", { type: "button", class: "primary", onclick: () => closeThen(() => jump(c.at, true)) },
+      "Lihat anak di cabang " + cabangName(c.at)));
+  });
+  if (opts.fromRef && !n.isSpouse) {
+    acts.append(el("button", { type: "button", onclick: () => closeThen(() => jump(n, false)) }, "Tampilkan di pohon"));
+  }
+  if (acts.childNodes.length) dBody.append(acts);
+
+  if (!dlg.open) dlg.showModal();
+  dBody.scrollTop = 0;
+
+  if (hasCoord && window.L) {
+    map = L.map("mapBox", { scrollWheelZoom: false }).setView([m.lat, m.lng], 16);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19, attribution: "&copy; OpenStreetMap"
+    }).addTo(map);
+    L.circleMarker([m.lat, m.lng], { radius: 8, color: "#6B4528", fillColor: "#1D6A73", fillOpacity: .9, weight: 2 })
+      .addTo(map).bindTooltip(m.nama || "Makam");
+    setTimeout(() => map && map.invalidateSize(), 60);
+  }
+}
+
+dlg.addEventListener("close", () => { if (map) { map.remove(); map = null; } });
+document.getElementById("dClose").onclick = () => dlg.close();
+dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
+
+</script>
+</body>
+</html>
