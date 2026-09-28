@@ -234,6 +234,74 @@ dialog::backdrop { background: rgba(18, 14, 8, .5); }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 footer { text-align: center; color: var(--gold); padding: 0 1rem 3rem; font-size: 1.3rem; }
 
+/* ---------- Filter gaya lembar samping ---------- */
+.qrow { display: flex; gap: .5rem; align-items: stretch; }
+.qrow .qbox { flex: 1; }
+.fbtn {
+  display: inline-flex; align-items: center; gap: .35rem; flex: none;
+  font-size: 1.02rem; padding: 0 .9rem; border-radius: 3px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--vellum); color: var(--ink); touch-action: manipulation;
+}
+.fbtn:hover { border-color: var(--binding); }
+.badge {
+  min-width: 1.35rem; height: 1.35rem; padding: 0 .3rem; border-radius: 999px;
+  background: var(--binding); color: var(--gold-soft); font-size: .82rem; line-height: 1.35rem; text-align: center;
+}
+.active { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .6rem; }
+.active:empty { display: none; }
+.active button {
+  font-size: .9rem; padding: .05rem .55rem; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--binding); background: var(--accent-soft); color: var(--ink);
+}
+.active button span { margin-left: .3rem; color: var(--muted); }
+.active .clearall { border-color: var(--line); background: transparent; font-style: italic; }
+.qtop { margin: .15rem 0 0; color: var(--muted); font-size: .98rem; }
+.qtop:empty { display: none; }
+.sortrow { display: flex; align-items: center; gap: .5rem; margin-top: .6rem; font-size: .98rem; color: var(--muted); }
+.sortrow select {
+  font-family: inherit; font-size: .98rem; color: var(--ink); background: var(--vellum);
+  border: 1px solid var(--line); border-radius: 3px; padding: .15rem .4rem;
+}
+
+dialog.sheet {
+  margin: 0 0 0 auto; width: min(27rem, 100%); max-width: 100%;
+  height: 100%; max-height: 100%; border-radius: 0; padding: 0;
+  display: none; flex-direction: column;
+}
+dialog.sheet[open] { display: flex; }
+.s-head { display: flex; align-items: center; justify-content: space-between; padding: calc(env(safe-area-inset-top, 0px) + .9rem) 1.2rem .7rem; border-bottom: 3px double var(--line); }
+.s-head h2 { margin: 0; font-size: 1.5rem; font-weight: 600; color: var(--binding); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .s-head h2 { color: var(--gold); } }
+.s-head .d-close { position: static; }
+.s-body { flex: 1; overflow-y: auto; padding: .4rem 1.2rem 1rem; }
+.fgroup { padding: .8rem 0; border-bottom: 1px solid var(--gold-soft); }
+.fgroup h3 { margin: 0 0 .5rem; font-size: 1.08rem; font-weight: 600; }
+.fgroup .note { margin: -.35rem 0 .5rem; font-size: .9rem; color: var(--muted); font-style: italic; }
+.opts { display: flex; flex-wrap: wrap; gap: .4rem; }
+.opt {
+  font-size: .98rem; padding: .3rem .7rem; border-radius: 3px; cursor: pointer; text-align: left;
+  border: 1px solid var(--line); background: var(--vellum); color: var(--ink); touch-action: manipulation;
+}
+.opt .n { margin-left: .35rem; color: var(--muted); font-size: .88rem; }
+.opt[aria-pressed="true"] { border-color: var(--binding); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--binding); }
+.opt[disabled] { opacity: .42; cursor: default; }
+.more-opts { margin-top: .45rem; font-size: .95rem; background: none; border: 0; padding: 0; color: var(--binding); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .more-opts { color: var(--accent); } }
+.s-foot {
+  display: grid; grid-template-columns: 1fr 1.6fr; gap: .6rem;
+  padding: .8rem 1.2rem calc(.8rem + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); background: var(--leaf);
+}
+.s-foot button {
+  font-size: 1.05rem; padding: .55rem .8rem; border-radius: 3px; cursor: pointer;
+  border: 1px solid var(--line); background: transparent; color: var(--ink);
+}
+.s-foot button.primary { background: var(--binding); border-color: var(--binding); color: var(--gold-soft); }
+@media (max-width: 560px) {
+  dialog.sheet { margin: auto 0 0; width: 100%; height: auto; max-height: 90vh; border-radius: 10px 10px 0 0; }
+  .s-head { padding-top: .9rem; }
+  .fbtn { padding: 0 .7rem; }
+}
+
 @media (max-width: 560px) {
   body { font-size: 1.08rem; }
   dialog { width: 100%; max-width: 100%; margin: auto 0 0; border-radius: 8px 8px 0 0; }
@@ -266,25 +334,30 @@ footer { text-align: center; color: var(--gold); padding: 0 1rem 3rem; font-size
 
   <section class="finder" role="search" aria-labelledby="findTitle">
     <h2 id="findTitle">Cari dalam silsilah</h2>
-    <div class="qbox">
-      <label for="q" class="sr">Kata pencarian</label>
-      <input id="q" type="search" autocomplete="off" spellcheck="false"
-        placeholder="Nama, nama ayah atau ibu, pasangan, atau tempat">
-      <button type="button" class="qclear" id="qclear" aria-label="Hapus pencarian" hidden>&times;</button>
+    <div class="qrow">
+      <div class="qbox">
+        <label for="q" class="sr">Kata pencarian</label>
+        <input id="q" type="search" autocomplete="off" spellcheck="false"
+          placeholder="Nama, nama ayah atau ibu, pasangan, atau tempat">
+        <button type="button" class="qclear" id="qclear" aria-label="Hapus kata pencarian" hidden>&times;</button>
+      </div>
+      <button type="button" class="fbtn" id="fbtn" aria-haspopup="dialog">
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 3h12l-4.6 5.4V13l-2.8 1.2V8.4z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        Filter <span class="badge" id="fbadge" hidden></span>
+      </button>
     </div>
-    <div class="chips" id="fcat" role="group" aria-label="Cari berdasarkan">
-      <button type="button" data-v="semua" aria-pressed="true">Semua</button>
-      <button type="button" data-v="nama" aria-pressed="false">Nama</button>
-      <button type="button" data-v="ortu" aria-pressed="false">Anak dari (ayah/ibu)</button>
-      <button type="button" data-v="pasangan" aria-pressed="false">Pasangan</button>
-      <button type="button" data-v="tempat" aria-pressed="false">Tempat</button>
-    </div>
-    <div class="chips" id="fstat" role="group" aria-label="Status">
-      <button type="button" data-v="semua" aria-pressed="true">Semua status</button>
-      <button type="button" data-v="hidup" aria-pressed="false">Masih hidup</button>
-      <button type="button" data-v="wafat" aria-pressed="false">Sudah wafat</button>
-    </div>
+    <div class="active" id="active"></div>
     <p class="qinfo" id="qinfo" aria-live="polite"></p>
+    <p class="qtop" id="qtop"></p>
+    <div class="sortrow" id="sortrow" hidden>
+      <label for="sort">Urutkan</label>
+      <select id="sort">
+        <option value="cocok">Paling cocok</option>
+        <option value="nama">Nama A sampai Z</option>
+        <option value="gen">Keturunan ke-</option>
+        <option value="cabang">Cabang</option>
+      </select>
+    </div>
     <ol class="results" id="results"></ol>
   </section>
 
@@ -305,6 +378,18 @@ footer { text-align: center; color: var(--gold); padding: 0 1rem 3rem; font-size
     <button type="button" class="d-close" id="dClose" aria-label="Tutup keterangan">&times;</button>
   </div>
   <div class="d-body" id="dBody"></div>
+</dialog>
+
+<dialog id="fdlg" class="sheet" aria-labelledby="fTitle">
+  <div class="s-head">
+    <h2 id="fTitle">Filter</h2>
+    <button type="button" class="d-close" id="fclose" aria-label="Tutup filter">&times;</button>
+  </div>
+  <div class="s-body" id="fbody"></div>
+  <div class="s-foot">
+    <button type="button" id="freset">Atur ulang</button>
+    <button type="button" id="fapply" class="primary">Terapkan</button>
+  </div>
 </dialog>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -1523,17 +1608,46 @@ dlg.addEventListener("close", () => { if (map) { map.remove(); map = null; } });
 document.getElementById("dClose").onclick = () => dlg.close();
 dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
 
-/* ---------- Pencarian ---------- */
+/* ---------- Pencarian dan filter ---------- */
 (function () {
   const norm = s => (s == null ? "" : String(s)).toLowerCase().normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "").replace(/[\u2019'`]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
 
-  // Semua orang: keturunan dan pasangan dari luar keluarga
-  const seen = new Set(), people = [];
-  allNodes.forEach(n => {
-    if (!n.placeholder && !seen.has(n)) { seen.add(n); people.push(n); }
-    n.unions.forEach(un => { const s = un.spouse; if (s && !un.ref && !seen.has(s)) { seen.add(s); people.push(s); } });
-  });
+  /* Nama tempat: satukan ejaan yang sama */
+  function canon(raw) {
+    if (!raw) return "";
+    let v = String(raw).trim().replace(/\s+/g, " ");
+    v = v.replace(/Lepoq/gi, "Lepok").replace(/\bBetu\b/gi, "Batu").replace(/\bSangata\b/gi, "Sangatta")
+         .replace(/\bSanggata\b/gi, "Sangatta").replace(/Samarinnda/gi, "Samarinda").replace(/\bLobang\b/gi, "Lubang")
+         .replace(/\bAmpan\b/gi, "Ampen").replace(/^Susus$/i, "Susuk").replace(/\s*\/\s*/g, "/");
+    return v;
+  }
+  const SD = "Susuk Dalam";
+  // Tempat lahir dan tempat dibesarkan: Susuk sama dengan Susuk Dalam (sebelum pemekaran).
+  const MERGE = { lahir: true, dibesarkan: true };
+  function placeVal(field, raw) {
+    let v = canon(raw);
+    if (MERGE[field] && v.toLowerCase() === "susuk") v = SD;
+    return v;
+  }
+
+  /* Garis keturunan dan cabang, dihitung lewat ayah dan ibu */
+  const lineMemo = new Map(), branchMemo = new Map();
+  function bloodParents(n) {
+    return [n.parent, n.parentUnion && n.parentUnion.spouse].filter(p => p && !p.isSpouse && !p.placeholder && p.depth >= 1);
+  }
+  function linesOf(n) {
+    if (lineMemo.has(n)) return lineMemo.get(n);
+    const s = new Set();
+    if (n.depth === 1) s.add(n.nama); else bloodParents(n).forEach(p => linesOf(p).forEach(x => s.add(x)));
+    lineMemo.set(n, s); return s;
+  }
+  function branchesOf(n) {
+    if (branchMemo.has(n)) return branchMemo.get(n);
+    const s = new Set();
+    if (n.depth === 2) s.add(n.nama); else if (n.depth > 2) bloodParents(n).forEach(p => branchesOf(p).forEach(x => s.add(x)));
+    branchMemo.set(n, s); return s;
+  }
 
   function namesOf(p) { return [p.nama, p.panggilan].concat(p.alias ? p.alias.split(/,\s*/) : []).filter(Boolean); }
   function parentsOf(p) {
@@ -1550,42 +1664,157 @@ dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
     couples(p).forEach(c => { if (c.spouse) out.push(...namesOf(c.spouse)); });
     return out;
   }
-  function placesOf(p) {
-    return [p.tempatLahir, p.dibesarkan, p.domisili, p.tinggalSekarang, p.tempatWafat, p.makam && p.makam.nama].filter(Boolean);
-  }
 
-  const index = people.filter(p => !p.belumBernama).map(p => ({
-    p,
-    nama: norm(namesOf(p).join(" ")),
-    ortu: norm(parentsOf(p).join(" ")),
-    pasangan: norm(spousesOf(p).join(" ")),
-    tempat: norm(placesOf(p).join(" "))
-  }));
-
-  const q = document.getElementById("q");
-  const qclear = document.getElementById("qclear");
-  const qinfo = document.getElementById("qinfo");
-  const list = document.getElementById("results");
-  let cat = "semua", stat = "semua", limit = 40, timer = null;
-
-  function chipGroup(id, set) {
-    const g = document.getElementById(id);
-    g.addEventListener("click", e => {
-      const b = e.target.closest("button"); if (!b) return;
-      g.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
-      set(b.dataset.v); limit = 40; run();
+  /* Semua orang */
+  const seen = new Set(), entries = [];
+  allNodes.forEach(n => {
+    if (!n.placeholder && !n.belumBernama && !seen.has(n)) { seen.add(n); entries.push(makeEntry(n, false)); }
+    n.unions.forEach(un => {
+      const s = un.spouse;
+      if (s && !un.ref && !seen.has(s) && !/belum dicatat/.test(s.nama)) { seen.add(s); entries.push(makeEntry(s, true)); }
     });
+  });
+
+  function makeEntry(p, isSp) {
+    const base = isSp ? p.union.owner : p;
+    const e = {
+      p, isSp,
+      garis: [...linesOf(base)],
+      cabang: [...branchesOf(base)],
+      status: [p.wafat === true ? "wafat" : p.wafat === false ? "hidup" : "belum"],
+      jk: [p.jk === "L" ? "L" : p.jk === "P" ? "P" : "belum"],
+      gen: isSp ? [] : ["g" + p.depth],
+      lain: (!isSp && couples(p).some(c => c.isRef)) ? ["sepupu"] : [],
+      raw: {},
+      t: {
+        nama: norm(namesOf(p).join(" ")),
+        ortu: norm(parentsOf(p).join(" ")),
+        pasangan: norm(spousesOf(p).join(" ")),
+        tempat: norm([p.tempatLahir, p.dibesarkan, p.domisili, p.tinggalSekarang, p.tempatWafat, p.makam && p.makam.nama].filter(Boolean).map(canon).join(" "))
+      }
+    };
+    [["tinggal", p.tinggalSekarang], ["lahir", p.tempatLahir], ["dibesarkan", p.dibesarkan], ["domisili", p.domisili]].forEach(([f, raw]) => {
+      const v = placeVal(f, raw);
+      e.raw[f] = v;
+      e[f] = v ? ["v:" + v, v === SD ? "in" : "out"] : ["none"];
+    });
+    const mk = canon(p.makam && p.makam.nama);
+    e.raw.makam = mk;
+    e.makam = p.wafat === true ? (mk ? ["v:" + mk] : ["none"]) : [];
+    return e;
   }
-  chipGroup("fcat", v => cat = v);
-  chipGroup("fstat", v => stat = v);
 
-  const has = (field, toks) => toks.every(t => (" " + field).includes(" " + t) || field.includes(t));
-  const LABEL = { nama: "nama cocok", ortu: "anak dari yang dicari", pasangan: "pasangan cocok", tempat: "tempat cocok" };
+  /* Kelompok filter */
+  const PLACE_NOTE = { lahir: "Susuk dan Susuk Dalam dihitung sama.", dibesarkan: "Susuk dan Susuk Dalam dihitung sama." };
+  const GROUPS = [
+    { key: "garis", title: "Keturunan", fixed: [["Kunggit", "Kunggit"], ["Gantihan", "Gantihan"]] },
+    { key: "cabang", title: "Cabang", fixed: ["Singking", "Talenttan", "Pipi", "Layau", "Nanang", "Kidang", "Wiwik"].map(x => [x, x]) },
+    { key: "status", title: "Status", fixed: [["hidup", "Masih hidup"], ["wafat", "Sudah wafat"], ["belum", "Belum dicatat"]] },
+    { key: "jk", title: "Jenis kelamin", fixed: [["L", "Laki-laki"], ["P", "Perempuan"], ["belum", "Belum dicatat"]] },
+    { key: "tinggal", title: "Tempat tinggal sekarang", place: true },
+    { key: "lahir", title: "Tempat lahir", place: true },
+    { key: "dibesarkan", title: "Tempat dibesarkan", place: true },
+    { key: "domisili", title: "Domisili", place: true },
+    { key: "makam", title: "Makam", place: true, noInOut: true, note: "Hanya untuk yang sudah wafat." },
+    { key: "gen", title: "Keturunan ke-", fixed: [1, 2, 3, 4, 5, 6].map(i => ["g" + i, "Ke-" + i]) },
+    { key: "lain", title: "Lainnya", fixed: [["sepupu", "Kawin sepupu"]] },
+    { key: "mode", title: "Tampilkan juga", fixed: [["pasangan", "Pasangan dari luar keluarga"]], toggle: true },
+    { key: "cari", title: "Kata pencarian dicocokkan dengan", single: true,
+      fixed: [["semua", "Semua"], ["nama", "Nama"], ["ortu", "Nama ayah atau ibu"], ["pasangan", "Nama pasangan"], ["tempat", "Tempat"]] }
+  ];
+  const FILTER_KEYS = GROUPS.filter(g => !g.toggle && !g.single).map(g => g.key);
 
+  function blank() {
+    const s = {}; GROUPS.forEach(g => s[g.key] = new Set()); s.cari = new Set(["semua"]); return s;
+  }
+  let applied = blank(), draft = blank();
+  const clone = st => { const s = {}; for (const k in st) s[k] = new Set(st[k]); return s; };
+
+  function optionsFor(g) {
+    if (g.fixed) return g.fixed.map(([v, label]) => ({ v, label }));
+    const counts = new Map();
+    entries.forEach(e => (e[g.key] || []).forEach(v => { if (v.startsWith("v:") && v.slice(2) !== SD) counts.set(v, (counts.get(v) || 0) + 1); }));
+    const places = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "id"))
+      .map(([v]) => ({ v, label: v.slice(2) }));
+    const head = [];
+    if (!g.noInOut) {
+      head.push({ v: "in", label: "Di Susuk Dalam" + (MERGE[g.key] ? " (termasuk Susuk)" : "") });
+      head.push({ v: "out", label: "Di luar Susuk Dalam" });
+    }
+    const tail = [{ v: "none", label: "Belum dicatat" }];
+    return head.concat(places, tail);
+  }
+  const OPTS = {}; GROUPS.forEach(g => OPTS[g.key] = optionsFor(g));
+  const labelOf = (key, v) => { const o = OPTS[key].find(x => x.v === v); return o ? o.label : v; };
+
+  /* Pencocokan */
+  const has = (field, toks) => toks.every(t => field.includes(t));
+  function textHit(e, toks, st) {
+    if (!toks.length) return ["-"];
+    const mode = [...st.cari][0] || "semua";
+    const cats = mode === "semua" ? ["nama", "ortu", "pasangan", "tempat"] : [mode];
+    return cats.filter(c => has(e.t[c], toks));
+  }
+  function passes(e, st, skip) {
+    if (e.isSp && !st.mode.has("pasangan")) return false;
+    for (const k of FILTER_KEYS) {
+      if (k === skip || !st[k].size) continue;
+      if (!(e[k] || []).some(v => st[k].has(v))) return false;
+    }
+    return true;
+  }
+  function filterAll(st, toks, skip) {
+    const out = [];
+    entries.forEach(e => {
+      if (!passes(e, st, skip)) return;
+      const why = textHit(e, toks, st);
+      if (why.length) out.push({ e, why });
+    });
+    return out;
+  }
+
+  /* Elemen */
+  const q = document.getElementById("q"), qclear = document.getElementById("qclear");
+  const qinfo = document.getElementById("qinfo"), qtop = document.getElementById("qtop");
+  const list = document.getElementById("results"), activeBox = document.getElementById("active");
+  const sortSel = document.getElementById("sort"), sortRow = document.getElementById("sortrow");
+  const fbtn = document.getElementById("fbtn"), fbadge = document.getElementById("fbadge");
+  const fdlg = document.getElementById("fdlg"), fbody = document.getElementById("fbody");
+  const fapply = document.getElementById("fapply");
+  let limit = 40, timer = null;
+  const tokens = () => norm(q.value).split(" ").filter(Boolean);
+  const activeCount = st => FILTER_KEYS.reduce((t, k) => t + st[k].size, 0) + st.mode.size + (st.cari.has("semua") ? 0 : 1);
+
+  /* Kalimat ringkas */
+  function joinOr(arr) { return arr.length <= 1 ? arr.join("") : arr.slice(0, -1).join(", ") + " atau " + arr[arr.length - 1]; }
+  function joinAnd(arr) { return arr.length <= 1 ? arr.join("") : arr.slice(0, -1).join(", ") + ", dan " + arr[arr.length - 1]; }
+  const VERB = { tinggal: "tinggal", lahir: "lahir", dibesarkan: "dibesarkan", domisili: "berdomisili", makam: "dimakamkan" };
+  function placePhrase(k, set) {
+    const parts = [...set].map(v => {
+      if (v === "in") return VERB[k] + " di Susuk Dalam" + (MERGE[k] ? " (termasuk Susuk)" : "");
+      if (v === "out") return VERB[k] + " di luar Susuk Dalam";
+      if (v === "none") return ({ tinggal: "tempat tinggalnya", lahir: "tempat lahirnya", dibesarkan: "tempat dibesarkannya", domisili: "domisilinya", makam: "makamnya" })[k] + " belum dicatat";
+      return VERB[k] + " di " + v.slice(2);
+    });
+    return joinOr(parts);
+  }
+  function describe(st) {
+    const ph = [];
+    if (st.garis.size) ph.push("keturunan " + joinOr([...st.garis]));
+    if (st.cabang.size) ph.push("dari cabang " + joinOr([...st.cabang]));
+    if (st.jk.size) ph.push(joinOr([...st.jk].map(v => ({ L: "laki-laki", P: "perempuan", belum: "jenis kelaminnya belum dicatat" })[v])));
+    if (st.gen.size) ph.push("keturunan " + joinOr([...st.gen].map(v => "ke-" + v.slice(1))));
+    if (st.status.size) ph.push(joinOr([...st.status].map(v => ({ hidup: "masih hidup", wafat: "sudah wafat", belum: "statusnya belum dicatat" })[v])));
+    ["tinggal", "lahir", "dibesarkan", "domisili", "makam"].forEach(k => { if (st[k].size) ph.push(placePhrase(k, st[k])); });
+    if (st.lain.has("sepupu")) ph.push("kawin sepupu");
+    return joinAnd(ph);
+  }
+
+  /* Hasil */
   function highlight(text, toks) {
     const frag = document.createDocumentFragment();
     if (!text) return frag;
-    const esc = toks.filter(t => t.length > 0).map(t => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    const esc = toks.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
     if (!esc.length) { frag.append(text); return frag; }
     const re = new RegExp("(" + esc.join("|") + ")", "ig");
     let last = 0;
@@ -1597,7 +1826,6 @@ dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
     if (last < text.length) frag.append(text.slice(last));
     return frag;
   }
-
   function relText(p) {
     if (p.isSpouse) return "Pasangan dari " + fullName(p.union.owner);
     if (p.parent && p.parent.placeholder) return "Anak dari orang tua Kunggit & Gantihan";
@@ -1605,87 +1833,181 @@ dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
     const bits = [ot.ayah, ot.ibu].filter(Boolean);
     return bits.length ? "Anak dari " + bits.join(" & ") : "";
   }
-  function ctxText(p, why) {
-    const out = [];
+  function ctxText(e) {
+    const p = e.p, out = [];
     if (!p.isSpouse) {
       out.push("Keturunan ke-" + p.depth);
-      const cl = cabangLabel(p); if (cl) out.push(p.depth === 2 ? cl.charAt(0).toLowerCase() + cl.slice(1) : "cabang " + cl);
+      const cb = e.cabang; if (cb.length) out.push("cabang " + cb.join(" dan "));
+      else out.push("keturunan " + e.garis.join(" dan "));
+      if (e.garis.length > 1) out.push("keturunan Kunggit dan Gantihan");
+      const sp = couples(p).filter(c => c.spouse).map(c => fullName(c.spouse));
+      if (sp.length) out.push("pasangan " + sp.join(", "));
     }
-    const sp = p.isSpouse ? [] : couples(p).filter(c => c.spouse).map(c => fullName(c.spouse));
-    if (sp.length) out.push("pasangan " + sp.join(", "));
-    if (why.includes("tempat")) {
-      const pl = [];
-      if (p.tempatLahir) pl.push("lahir di " + p.tempatLahir);
-      if (p.wafat !== true && p.tinggalSekarang) pl.push("tinggal di " + p.tinggalSekarang);
-      if (p.wafat === true && p.makam && p.makam.nama) pl.push("makam " + p.makam.nama);
-      if (pl.length) out.push(pl.join(", "));
-    }
+    const pl = [];
+    if (e.raw.lahir) pl.push("lahir di " + e.raw.lahir);
+    if (p.wafat !== true && e.raw.tinggal) pl.push("tinggal di " + e.raw.tinggal);
+    if (p.wafat === true && e.raw.makam) pl.push("makam " + e.raw.makam);
+    if (pl.length) out.push(pl.join(", "));
     return out.join("; ");
+  }
+  const LABEL = { nama: "nama cocok", ortu: "anak dari yang dicari", pasangan: "pasangan cocok", tempat: "tempat cocok" };
+
+  function sortHits(hits, toks) {
+    const by = sortSel.value;
+    const nm = h => h.e.p.nama;
+    const score = h => {
+      let s = 0; const w = h.why;
+      if (w.includes("nama")) s += 100 + (h.e.t.nama.startsWith(toks[0] || "") ? 50 : 0);
+      if (w.includes("ortu")) s += 40; if (w.includes("pasangan")) s += 30; if (w.includes("tempat")) s += 10;
+      return s - (h.e.isSp ? 5 : 0);
+    };
+    const depth = h => h.e.isSp ? 99 : h.e.p.depth;
+    hits.sort((a, b) => {
+      if (by === "nama") return nm(a).localeCompare(nm(b), "id");
+      if (by === "gen") return depth(a) - depth(b) || nm(a).localeCompare(nm(b), "id");
+      if (by === "cabang") return (a.e.cabang[0] || "~").localeCompare(b.e.cabang[0] || "~", "id") || depth(a) - depth(b) || nm(a).localeCompare(nm(b), "id");
+      if (toks.length) return score(b) - score(a) || nm(a).localeCompare(nm(b), "id");
+      return depth(a) - depth(b) || nm(a).localeCompare(nm(b), "id");
+    });
+  }
+
+  function renderActive() {
+    activeBox.replaceChildren();
+    const n = activeCount(applied);
+    fbadge.hidden = !n; fbadge.textContent = n;
+    GROUPS.forEach(g => {
+      if (g.key === "cari" && applied.cari.has("semua")) return;
+      applied[g.key].forEach(v => {
+        const txt = (g.key === "cari" ? "Cari di: " : g.key === "gen" ? "Keturunan " : "") + labelOf(g.key, v);
+        activeBox.append(el("button", { type: "button", title: "Hapus filter ini", onclick: () => {
+          applied[g.key].delete(v); if (g.key === "cari") applied.cari.add("semua"); limit = 40; run();
+        } }, txt, el("span", { "aria-hidden": "true" }, "\u00d7")));
+      });
+    });
+    if (n) activeBox.append(el("button", { type: "button", class: "clearall", onclick: () => { applied = blank(); limit = 40; run(); } }, "Hapus semua filter"));
   }
 
   function run() {
-    const raw = q.value;
-    qclear.hidden = !raw;
-    const toks = norm(raw).split(" ").filter(Boolean);
-    list.replaceChildren();
-    if (!toks.length) { qinfo.textContent = ""; return; }
+    const toks = tokens();
+    qclear.hidden = !q.value;
+    renderActive();
+    list.replaceChildren(); qtop.textContent = "";
+    const nf = activeCount(applied);
+    if (!toks.length && !nf) { qinfo.textContent = ""; sortRow.hidden = true; return; }
 
-    const cats = cat === "semua" ? ["nama", "ortu", "pasangan", "tempat"] : [cat];
-    const hits = [];
-    index.forEach(e => {
-      if (stat === "hidup" && e.p.wafat !== false) return;
-      if (stat === "wafat" && e.p.wafat !== true) return;
-      const why = cats.filter(c => has(e[c], toks));
-      if (!why.length) return;
-      let score = 0;
-      if (why.includes("nama")) score += 100 + (e.nama.startsWith(toks[0]) ? 50 : 0) + (e.nama === toks.join(" ") ? 50 : 0);
-      if (why.includes("ortu")) score += 40;
-      if (why.includes("pasangan")) score += 30;
-      if (why.includes("tempat")) score += 10;
-      if (e.p.isSpouse) score -= 5;
-      hits.push({ e, why, score });
-    });
-    hits.sort((a, b) => b.score - a.score || a.e.p.nama.localeCompare(b.e.p.nama, "id"));
+    const hits = filterAll(applied, toks);
+    sortHits(hits, toks);
+    sortRow.hidden = !hits.length;
 
-    qinfo.textContent = hits.length
-      ? hits.length + " orang ditemukan" + (hits.length > limit ? ", " + limit + " teratas ditampilkan" : "")
-      : "Tidak ada yang cocok. Coba ejaan lain, sebagian nama, atau ganti pilihan di atas.";
+    // Kalimat jumlah
+    const desc = describe(applied);
+    const nSp = hits.filter(h => h.e.isSp).length;
+    let s;
+    if (!hits.length) s = "Tidak ada yang cocok. Coba ejaan lain, sebagian nama, atau kurangi filter.";
+    else {
+      s = hits.length + " orang";
+      if (toks.length) s += " cocok dengan \u201c" + q.value.trim() + "\u201d";
+      if (desc) s += (toks.length ? ", " : " ") + desc;
+      s += ".";
+      if (nSp) s += " Termasuk " + nSp + " pasangan dari luar keluarga.";
+      if (applied.garis.size === 1) {
+        const both = hits.filter(h => h.e.garis.length > 1).length;
+        const other = [...applied.garis][0] === "Kunggit" ? "Gantihan" : "Kunggit";
+        if (both) s += " " + both + " di antaranya juga keturunan " + other + ".";
+      }
+    }
+    qinfo.textContent = s;
+
+    // Tempat terbanyak bila ada filter "di luar Susuk Dalam"
+    const outKey = ["tinggal", "lahir", "dibesarkan", "domisili"].find(k => applied[k].has("out"));
+    if (outKey && hits.length) {
+      const c = new Map();
+      hits.forEach(h => { const v = h.e.raw[outKey]; if (v && v !== SD) c.set(v, (c.get(v) || 0) + 1); });
+      const top = [...c.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5).map(([v, k]) => v + " (" + k + ")");
+      if (top.length) qtop.textContent = "Terbanyak di " + joinAnd(top) + ".";
+    }
 
     hits.slice(0, limit).forEach(({ e, why }) => {
       const p = e.p;
-      const li = document.createElement("li");
       const box = el("div", { class: "res" });
       const who = el("button", { type: "button", class: "who", onclick: () => openDetail(p, { fromRef: true }) });
       who.append(highlight(p.nama, toks));
       if (p.jk) who.append(el("span", { class: "jk" }, "(" + p.jk + ")"));
       if (p.wafat === true) who.append(el("span", { class: "alm" }, almLabel(p)));
-      box.append(who, el("span", { class: "why" }, why.map(w => LABEL[w]).join(", ")));
+      box.append(who, el("span", { class: "why" }, toks.length ? why.map(w => LABEL[w]).join(", ") : ""));
       const extra = [];
       if (p.panggilan) extra.push("dipanggil " + p.panggilan);
       if (p.alias) extra.push("dikenal juga sebagai " + p.alias);
       if (extra.length) { const x = el("p", { class: "ctx" }); x.append(highlight(extra.join("; "), toks)); box.append(x); }
       const rt = relText(p);
       if (rt) { const r = el("p", { class: "rel" }); r.append(highlight(rt, toks)); box.append(r); }
-      const ct = ctxText(p, why);
+      const ct = ctxText(e);
       if (ct) { const c = el("p", { class: "ctx" }); c.append(highlight(ct, toks)); box.append(c); }
       const target = p.isSpouse ? p.union.owner : p;
       box.append(el("button", { type: "button", class: "go", onclick: () => jump(target, false) },
         p.isSpouse ? "Tampilkan " + target.nama + " di pohon" : "Tampilkan di pohon"));
-      li.append(box);
-      list.append(li);
+      const li = document.createElement("li"); li.append(box); list.append(li);
     });
     if (hits.length > limit) {
       const li = document.createElement("li");
-      li.append(el("button", { type: "button", class: "more", onclick: () => { limit = hits.length; run(); } }, "Tampilkan semua " + hits.length + " hasil"));
+      li.append(el("button", { type: "button", class: "more", onclick: () => { limit = hits.length; run(); } }, "Tampilkan semua " + hits.length + " orang"));
       list.append(li);
     }
   }
+
+  /* Panel filter */
+  const expanded = new Set();
+  function renderSheet() {
+    const toks = tokens();
+    fbody.replaceChildren();
+    GROUPS.forEach(g => {
+      const base = (g.toggle || g.single) ? null : filterAll(draft, toks, g.key);
+      const sec = el("section", { class: "fgroup" }, el("h3", null, g.title));
+      if (g.note || PLACE_NOTE[g.key]) sec.append(el("p", { class: "note" }, g.note || PLACE_NOTE[g.key]));
+      const opts = el("div", { class: "opts" });
+      const all = OPTS[g.key];
+      const MAX = 8;
+      const shown = expanded.has(g.key) ? all : all.slice(0, MAX);
+      all.forEach((o, i) => {
+        const sel = draft[g.key].has(o.v);
+        if (!shown.includes(o) && !sel) return;
+        let n = null;
+        if (base) n = base.filter(h => (h.e[g.key] || []).includes(o.v)).length;
+        const b = el("button", { type: "button", class: "opt", "aria-pressed": String(sel) }, o.label);
+        if (n !== null) { b.append(el("span", { class: "n" }, "(" + n + ")")); if (!n && !sel) b.disabled = true; }
+        b.addEventListener("click", () => {
+          const set = draft[g.key];
+          if (g.single) { set.clear(); set.add(o.v); }
+          else if (set.has(o.v)) set.delete(o.v); else set.add(o.v);
+          renderSheet();
+        });
+        opts.append(b);
+      });
+      sec.append(opts);
+      if (all.length > MAX) {
+        const open = expanded.has(g.key);
+        sec.append(el("button", { type: "button", class: "more-opts", onclick: () => {
+          if (open) expanded.delete(g.key); else expanded.add(g.key); renderSheet();
+        } }, open ? "Lebih sedikit" : "Lainnya (" + (all.length - MAX) + ")"));
+      }
+      fbody.append(sec);
+    });
+    const total = filterAll(draft, toks).length;
+    fapply.textContent = "Terapkan (" + total + " orang)";
+  }
+
+  fbtn.addEventListener("click", () => { draft = clone(applied); renderSheet(); fdlg.showModal(); });
+  document.getElementById("fclose").addEventListener("click", () => fdlg.close());
+  fdlg.addEventListener("click", e => { if (e.target === fdlg) fdlg.close(); });
+  document.getElementById("freset").addEventListener("click", () => { draft = blank(); renderSheet(); });
+  fapply.addEventListener("click", () => { applied = clone(draft); limit = 40; fdlg.close(); run(); });
+  sortSel.addEventListener("change", () => { limit = 40; run(); });
 
   q.addEventListener("input", () => { clearTimeout(timer); limit = 40; timer = setTimeout(run, 120); });
   q.addEventListener("keydown", e => { if (e.key === "Escape") { q.value = ""; run(); } });
   qclear.addEventListener("click", () => { q.value = ""; run(); q.focus(); });
   document.addEventListener("keydown", e => {
-    if (e.key === "/" && document.activeElement !== q && !dlg.open) { e.preventDefault(); q.focus(); }
+    if (e.key === "/" && document.activeElement !== q && !dlg.open && !fdlg.open) { e.preventDefault(); q.focus(); }
   });
 })();
 </script>
