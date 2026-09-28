@@ -8,152 +8,237 @@
 <title>Silsilah Lemuang</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@500;700&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
 :root {
-  --paper: #EDF0EA;
-  --panel: #F8FAF6;
-  --ink: #1E2922;
-  --muted: #5F6A63;
-  --ulin: #6B4528;
-  --line: #B79C84;
-  --river: #1D6A73;
-  --river-soft: #D6E7E8;
-  --flash: #F3E3B8;
-  --batu: #7D8380;
-  --focus: #1D6A73;
-  --serif: "Alegreya", Georgia, "Times New Roman", serif;
-  --sans: "Alegreya Sans", "Segoe UI", Roboto, Arial, sans-serif;
+  --vellum: #EFE6D2;
+  --leaf: #F8F2E4;
+  --ink: #2B241C;
+  --muted: #6B5D4A;
+  --binding: #1F3B2D;
+  --binding-deep: #152A20;
+  --gold: #B8954A;
+  --gold-soft: #EADDB9;
+  --line: #BCA784;
+  --accent: #1F3B2D;
+  --accent-soft: #DCE4D8;
+  --flash: #EBDDB0;
+  --batu: #8A7E6C;
+  --focus: #1F3B2D;
+  --serif: "EB Garamond", Garamond, "Times New Roman", Georgia, serif;
   box-sizing: border-box;
-  padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #161C18; --panel: #1F2722; --ink: #E4EAE5; --muted: #9AA59E;
-    --ulin: #D2A77F; --line: #6A5645; --river: #6FC1C9; --river-soft: #1E3A3D;
-    --flash: #4A3D1E; --batu: #8E9591; --focus: #6FC1C9;
+    --vellum: #15130F; --leaf: #1E1B16; --ink: #ECE3D0; --muted: #AFA38D;
+    --binding: #13251C; --binding-deep: #0C1812; --gold: #CDAE6A; --gold-soft: #3A3120;
+    --line: #564A38; --accent: #9CC3A8; --accent-soft: #1F2E25; --flash: #3D3420;
+    --batu: #8F8573; --focus: #9CC3A8;
   }
 }
 :root[data-theme="dark"] {
-  --paper: #161C18; --panel: #1F2722; --ink: #E4EAE5; --muted: #9AA59E;
-  --ulin: #D2A77F; --line: #6A5645; --river: #6FC1C9; --river-soft: #1E3A3D;
-  --flash: #4A3D1E; --batu: #8E9591; --focus: #6FC1C9;
+  --vellum: #15130F; --leaf: #1E1B16; --ink: #ECE3D0; --muted: #AFA38D;
+  --binding: #13251C; --binding-deep: #0C1812; --gold: #CDAE6A; --gold-soft: #3A3120;
+  --line: #564A38; --accent: #9CC3A8; --accent-soft: #1F2E25; --flash: #3D3420;
+  --batu: #8F8573; --focus: #9CC3A8;
 }
 *, *::before, *::after { box-sizing: inherit; }
-html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+html { scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 1rem); }
 body {
-  margin: 0; background: var(--paper); color: var(--ink);
-  font-family: var(--sans); font-size: 1.0625rem; line-height: 1.5;
+  margin: 0; background: var(--vellum); color: var(--ink);
+  font-family: var(--serif); font-size: 1.125rem; line-height: 1.6;
+  font-feature-settings: "kern", "liga", "onum";
 }
-.wrap { max-width: 46rem; margin: 0 auto; padding: 2rem 1.1rem 4rem; }
+button, input { font-family: inherit; }
 
-header h1 {
-  font-family: var(--serif); font-weight: 700; color: var(--ulin);
-  font-size: clamp(2.2rem, 7vw, 3.2rem); line-height: 1.05; margin: 0 0 .35rem;
-  letter-spacing: -.01em;
+/* ---------- Sampul ---------- */
+.cover {
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.07), transparent 65%),
+    var(--binding);
+  color: var(--gold-soft);
+  padding: calc(env(safe-area-inset-top, 0px) + 2.2rem) 1.1rem 2.4rem;
+  border-bottom: 6px double var(--gold);
 }
-.by { margin: 0 0 1.25rem; color: var(--muted); font-size: 1rem; }
-.hint { margin: 0 0 1rem; max-width: 38rem; }
-.legend { display: flex; flex-wrap: wrap; gap: .4rem 1.1rem; margin: 0 0 1.25rem; padding: 0; color: var(--muted); font-size: .95rem; }
+.plate {
+  max-width: 34rem; margin: 0 auto; text-align: center;
+  border: 1px solid var(--gold); outline: 1px solid var(--gold); outline-offset: 5px;
+  padding: 1.6rem 1.2rem 1.4rem;
+}
+.plate .orn { color: var(--gold); font-size: 1.4rem; line-height: 1; margin: 0 0 .6rem; }
+.plate h1 {
+  margin: 0; color: #E9D9AE; font-weight: 500;
+  font-size: clamp(2.3rem, 9vw, 3.6rem); line-height: 1.05;
+  font-variant: small-caps; letter-spacing: .06em;
+}
+.plate .sub { margin: .7rem 0 0; font-style: italic; color: #D9C99E; font-size: 1.05rem; }
+.plate .by { margin: .25rem 0 0; color: #C8B78B; font-size: .98rem; }
+
+.wrap { max-width: 46rem; margin: 0 auto; padding: 1.8rem 1.1rem 4rem; }
+.hint { margin: 0 0 .9rem; color: var(--ink); }
+.legend { display: flex; flex-wrap: wrap; gap: .3rem 1.2rem; margin: 0 0 1.4rem; padding: 0; color: var(--muted); font-size: 1rem; }
 .legend div { display: flex; gap: .35rem; }
-.legend dt { font-weight: 700; color: var(--ink); }
-.legend dd { margin: 0; }
-.tools { display: flex; gap: .5rem; margin-bottom: 1.75rem; }
+.legend dt { font-weight: 600; color: var(--ink); }
+.legend dd { margin: 0; font-style: italic; }
+
+/* ---------- Pencarian (indeks) ---------- */
+.finder {
+  background: var(--leaf); border: 1px solid var(--line); border-radius: 4px;
+  padding: 1rem 1rem .9rem; margin: 0 0 1.6rem;
+  box-shadow: inset 0 0 0 4px var(--leaf), inset 0 0 0 5px var(--gold-soft);
+}
+.finder h2 { margin: 0 0 .5rem; font-size: 1.3rem; font-weight: 600; color: var(--binding); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .finder h2 { color: var(--gold); } }
+.qbox { position: relative; }
+.qbox input {
+  width: 100%; font-size: 1.1rem; padding: .6rem 2.4rem .6rem .8rem;
+  background: var(--vellum); color: var(--ink);
+  border: 1px solid var(--line); border-radius: 3px;
+}
+.qbox input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+.qbox input::placeholder { color: var(--muted); font-style: italic; }
+.qbox input:focus { outline: 2px solid var(--focus); outline-offset: 1px; }
+.qclear {
+  position: absolute; right: .35rem; top: 50%; transform: translateY(-50%);
+  width: 30px; height: 30px; border: 0; background: none; color: var(--muted);
+  font-size: 1.3rem; cursor: pointer; border-radius: 50%;
+}
+.chips { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .6rem; }
+.chips button {
+  font-size: .95rem; padding: .1rem .7rem; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: transparent; color: var(--ink);
+  touch-action: manipulation;
+}
+.chips button[aria-pressed="true"] { background: var(--binding); border-color: var(--binding); color: var(--gold-soft); }
+.qinfo { margin: .7rem 0 0; color: var(--muted); font-size: .98rem; font-style: italic; }
+.qinfo:empty { display: none; }
+.results { list-style: none; margin: .5rem 0 0; padding: 0; max-height: 60vh; overflow-y: auto; }
+.results:empty { display: none; }
+.results li { border-top: 1px solid var(--gold-soft); }
+.res { display: grid; grid-template-columns: 1fr auto; gap: .1rem .8rem; padding: .55rem .2rem; align-items: start; }
+.res .who { background: none; border: 0; padding: 0; margin: 0; text-align: left; cursor: pointer; color: var(--ink); font-size: 1.12rem; font-weight: 600; }
+.res .who:hover { text-decoration: underline; text-decoration-color: var(--gold); }
+.res .rel, .res .ctx { grid-column: 1 / -1; margin: 0; font-size: .98rem; color: var(--muted); }
+.res .rel { color: var(--ink); }
+.res .why { font-size: .85rem; font-style: italic; color: var(--binding); white-space: nowrap; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .res .why { color: var(--accent); } }
+.res .go {
+  grid-column: 1 / -1; justify-self: start; margin-top: .2rem;
+  font-size: .9rem; padding: .05rem .6rem; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: transparent; color: var(--ink);
+}
+.res mark { background: var(--gold-soft); color: inherit; padding: 0 .05em; border-radius: 2px; }
+.more { margin: .6rem 0 0; font-size: .95rem; padding: .25rem .8rem; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--ink); cursor: pointer; }
+
+/* ---------- Pohon ---------- */
+.tools { display: flex; gap: .5rem; margin-bottom: 1.2rem; }
 .tools button, .d-actions button, .jump {
-  font: inherit; font-size: .95rem; padding: .4rem .85rem; border-radius: 999px;
+  font-size: 1rem; padding: .3rem .9rem; border-radius: 999px;
   border: 1px solid var(--line); background: transparent; color: var(--ink); cursor: pointer;
   touch-action: manipulation;
 }
-.tools button:hover, .d-actions button:hover, .jump:hover { border-color: var(--river); color: var(--river); }
-.jump { font-size: .85rem; padding: .15rem .6rem; }
+.tools button:hover, .d-actions button:hover, .jump:hover { border-color: var(--binding); }
+.jump { font-size: .9rem; padding: .05rem .6rem; }
 
 ul.tree, ul.branch { list-style: none; margin: 0; padding: 0; }
-ul.branch { margin-left: 13px; padding-left: 1.1rem; border-left: 2px solid var(--line); }
+ul.branch { margin-left: 13px; padding-left: 1.1rem; border-left: 1px solid var(--line); }
 ul.branch > li { position: relative; }
 ul.branch > li::before {
-  content: ""; position: absolute; left: -1.1rem; top: 1.25rem;
-  width: .9rem; border-top: 2px solid var(--line);
+  content: ""; position: absolute; left: -1.1rem; top: 1.3rem;
+  width: .9rem; border-top: 1px solid var(--line);
 }
-li.root { margin-bottom: 1.5rem; }
 li.root > .row {
-  background: var(--panel); border-left: 4px solid var(--ulin);
-  border-radius: 0 10px 10px 0; padding: .6rem .75rem;
+  background: var(--leaf); border: 1px solid var(--line); border-radius: 3px;
+  padding: .55rem .8rem; box-shadow: inset 0 0 0 3px var(--leaf), inset 0 0 0 4px var(--gold-soft);
 }
 li.root > .row .name { font-size: 1.3rem; }
+li.root > ul.branch > li > .row .name, li.root > ul.branch > li > .row .spouse { font-size: 1.28rem; font-weight: 600; }
+li.root > ul.branch > li { margin-top: .5rem; }
 
-.row { display: flex; align-items: center; flex-wrap: wrap; gap: .15rem .45rem; padding: .25rem 0; border-radius: 8px; }
-.row.flash { animation: flash 2.2s ease-out; }
-@keyframes flash { 0%, 40% { background: var(--flash); } 100% { background: transparent; } }
+.row { display: flex; align-items: center; flex-wrap: wrap; gap: .1rem .45rem; padding: .22rem 0; border-radius: 3px; }
+.row.flash { animation: flash 2.4s ease-out; }
+@keyframes flash { 0%, 45% { background: var(--flash); } 100% { background: transparent; } }
 .toggle {
-  width: 28px; height: 28px; flex: none; border-radius: 50%;
-  border: 1.5px solid var(--line); background: var(--panel); color: var(--ulin);
+  width: 26px; height: 26px; flex: none; border-radius: 50%;
+  border: 1px solid var(--line); background: var(--leaf); color: var(--binding);
   cursor: pointer; display: grid; place-items: center; padding: 0; touch-action: manipulation;
 }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .toggle { color: var(--gold); } }
 .toggle svg { transition: transform .15s ease; }
 li.open > .row .toggle svg { transform: rotate(90deg); }
-.leaf { width: 28px; flex: none; display: grid; place-items: center; }
-.leaf::after { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--line); }
+.leaf { width: 26px; flex: none; display: grid; place-items: center; }
+.leaf::after { content: ""; width: 5px; height: 5px; transform: rotate(45deg); background: var(--gold); }
 
-li.group > .row { padding: .35rem 0 .15rem; }
-.ring { width: 28px; flex: none; display: grid; place-items: center; }
-.ring::after { content: ""; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--ulin); background: var(--paper); }
-.glabel { font-size: .92rem; font-weight: 700; color: var(--ulin); }
-.glabel.unknown { font-weight: 500; color: var(--muted); font-style: italic; }
+li.group > .row { padding: .35rem 0 .1rem; }
+.ring { width: 26px; flex: none; display: grid; place-items: center; }
+.ring::after { content: ""; width: 9px; height: 9px; transform: rotate(45deg); border: 1px solid var(--gold); background: var(--vellum); }
+.glabel { font-size: 1rem; font-style: italic; color: var(--muted); }
+.glabel.unknown { color: var(--batu); }
 
 .name, .spouse {
-  font-family: var(--serif); font-weight: 500; font-size: 1.12rem; color: var(--ink);
-  background: none; border: 0; padding: .1rem .3rem; margin: 0; border-radius: 6px; cursor: pointer;
-  text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 4px;
+  font-weight: 500; font-size: 1.14rem; color: var(--ink);
+  background: none; border: 0; padding: 0 .25rem; margin: 0; border-radius: 3px; cursor: pointer;
+  text-decoration: underline dotted; text-decoration-color: var(--line); text-underline-offset: 4px;
   touch-action: manipulation; user-select: none; -webkit-user-select: none;
 }
-.name:hover, .spouse:hover { background: var(--river-soft); text-decoration-color: var(--river); }
-.spouse { font-size: 1.05rem; }
-.jk { font-family: var(--sans); font-size: .85rem; color: var(--muted); margin-left: .2rem; }
-.alm { font-family: var(--sans); font-size: .85rem; color: var(--batu); font-style: italic; margin-left: .25rem; }
-.meta { font-size: .88rem; color: var(--muted); }
-.amp { color: var(--muted); }
-.kin { font: inherit; font-size: .8rem; color: var(--river); background: var(--river-soft); border: 1px solid var(--river); border-radius: 999px; padding: 0 .55rem; cursor: pointer; touch-action: manipulation; }
-.kin:hover { background: var(--river); color: var(--panel); }
+.name:hover, .spouse:hover { background: var(--gold-soft); text-decoration-color: var(--gold); }
+.spouse { font-size: 1.08rem; }
+.jk { font-size: .88rem; color: var(--muted); margin-left: .15rem; }
+.alm { font-size: .9rem; color: var(--batu); font-style: italic; margin-left: .25rem; }
+.meta { font-size: .95rem; color: var(--muted); font-style: italic; }
+.amp { color: var(--gold); font-style: italic; }
 .name.unnamed { font-style: italic; color: var(--muted); }
-.flag { font-size: .78rem; color: #8A5A00; border: 1px solid #D9B25C; border-radius: 999px; padding: 0 .45rem; }
-.d-body dt.konf, .d-body dd.konf { color: #8A5A00; }
-@media (prefers-color-scheme: dark) { .flag, .d-body dt.konf, .d-body dd.konf { color: #E8C27A; border-color: #8A6A2A; } }
-
-button:focus-visible, a:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
-
-dialog {
-  border: 0; padding: 0; width: min(34rem, calc(100% - 2rem));
-  background: var(--panel); color: var(--ink); border-radius: 14px;
-  box-shadow: 0 18px 50px rgba(20, 30, 25, .28);
+.kin {
+  font-size: .85rem; font-style: italic; color: var(--binding); background: var(--accent-soft);
+  border: 1px solid var(--binding); border-radius: 999px; padding: 0 .55rem; cursor: pointer; touch-action: manipulation;
 }
-dialog::backdrop { background: rgba(15, 22, 18, .45); }
-.d-head { padding: 1.1rem 1.2rem .6rem; border-bottom: 1px solid var(--line); position: relative; }
-.d-head h2 { font-family: var(--serif); font-size: 1.6rem; margin: 0; padding-right: 2.5rem; color: var(--ulin); line-height: 1.15; }
-.d-sub { margin: .2rem 0 0; color: var(--muted); font-size: .95rem; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .kin { color: var(--accent); border-color: var(--accent); } }
+.kin:hover { background: var(--binding); color: var(--gold-soft); }
+.flag { font-size: .8rem; color: #7A5A12; border: 1px solid var(--gold); border-radius: 999px; padding: 0 .45rem; }
+.d-body dt.konf, .d-body dd.konf { color: #7A5A12; }
+
+button:focus-visible, a:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* ---------- Pop up ---------- */
+dialog {
+  border: 1px solid var(--line); padding: 0; width: min(34rem, calc(100% - 2rem));
+  background: var(--leaf); color: var(--ink); border-radius: 4px;
+  box-shadow: 0 20px 50px rgba(20, 15, 8, .35), inset 0 0 0 4px var(--leaf), inset 0 0 0 5px var(--gold-soft);
+}
+dialog::backdrop { background: rgba(18, 14, 8, .5); }
+.d-head { padding: 1.1rem 1.3rem .7rem; border-bottom: 3px double var(--line); position: relative; }
+.d-head h2 { font-size: 1.75rem; font-weight: 600; margin: 0; padding-right: 2.5rem; color: var(--binding); line-height: 1.15; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .d-head h2 { color: var(--gold); } }
+.d-sub { margin: .2rem 0 0; color: var(--muted); font-style: italic; font-size: 1rem; }
 .d-close {
   position: absolute; top: .8rem; right: .8rem; width: 34px; height: 34px; border-radius: 50%;
-  border: 1px solid var(--line); background: transparent; color: var(--ink); font-size: 1.2rem; cursor: pointer;
+  border: 1px solid var(--line); background: transparent; color: var(--ink); font-size: 1.25rem; cursor: pointer;
 }
-.d-body { padding: .9rem 1.2rem 1.3rem; max-height: 70vh; overflow-y: auto; }
-.d-body dl { margin: 0; display: grid; grid-template-columns: minmax(8rem, auto) 1fr; gap: .45rem 1rem; }
-.d-body dt { color: var(--muted); font-size: .95rem; }
+.d-body { padding: .9rem 1.3rem 1.3rem; max-height: 70vh; overflow-y: auto; }
+.d-body dl { margin: 0; display: grid; grid-template-columns: minmax(8.5rem, auto) 1fr; gap: .4rem 1rem; }
+.d-body dt { color: var(--muted); font-style: italic; font-size: 1rem; }
 .d-body dd { margin: 0; }
-.d-body dd .line + .line { margin-top: .3rem; }
-.d-body dd .line b { font-weight: 700; color: var(--ulin); }
+.d-body dd .line + .line { margin-top: .25rem; }
+.d-body dd .line b { font-weight: 600; color: var(--binding); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .d-body dd .line b { color: var(--gold); } }
 .d-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.1rem; }
-.d-actions button.primary { background: var(--river); border-color: var(--river); color: var(--panel); }
+.d-actions button.primary { background: var(--binding); border-color: var(--binding); color: var(--gold-soft); }
 .empty { color: var(--batu); font-style: italic; }
 .map-box { margin-top: 1rem; }
-.map { height: 210px; border-radius: 10px; border: 1px solid var(--line); margin-top: .5rem; }
-.map-links { display: flex; flex-wrap: wrap; gap: .4rem 1rem; margin-top: .45rem; font-size: .95rem; }
-.map-links a { color: var(--river); }
+.map { height: 210px; border-radius: 3px; border: 1px solid var(--line); margin-top: .5rem; }
+.map-links { display: flex; flex-wrap: wrap; gap: .4rem 1rem; margin-top: .45rem; font-size: 1rem; }
+.map-links a { color: var(--binding); }
+
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+footer { text-align: center; color: var(--gold); padding: 0 1rem 3rem; font-size: 1.3rem; }
 
 @media (max-width: 560px) {
-  dialog { width: 100%; max-width: 100%; margin: auto 0 0; border-radius: 16px 16px 0 0; }
+  body { font-size: 1.08rem; }
+  dialog { width: 100%; max-width: 100%; margin: auto 0 0; border-radius: 8px 8px 0 0; }
   .d-body { padding-bottom: calc(1.3rem + env(safe-area-inset-bottom, 0px)); }
-  .d-body dl { grid-template-columns: 1fr; gap: .1rem; }
+  .d-body dl { grid-template-columns: 1fr; gap: 0; }
   .d-body dd { margin-bottom: .55rem; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -163,32 +248,61 @@ dialog::backdrop { background: rgba(15, 22, 18, .45); }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
+<header class="cover">
+  <div class="plate">
+    <p class="orn" aria-hidden="true">&#10086;</p>
     <h1>Silsilah Lemuang</h1>
-    <p class="by">Catatan silsilah oleh Lamri, S.P.</p>
-    <p class="hint">Ketuk nama sekali untuk melihat detail. Ketuk dua kali untuk membuka anak-anaknya. Tombol panah di sebelah kiri nama juga membuka dan menutup anak. Nama pasangan, ayah, dan ibu ada di pop up. Tanda "kawin sepupu" bisa diketuk untuk melihat pasangan atau anaknya; untuk perkawinan sesama keturunan, anak dicatat di cabang suami.</p>
-    <dl class="legend">
-      <div><dt>L</dt><dd>laki-laki</dd></div>
-      <div><dt>P</dt><dd>perempuan</dd></div>
-      <div><dt>Alm. / Almh.</dt><dd>sudah wafat</dd></div>
-      <div><dt>kawin sepupu</dt><dd>pasangan sesama keturunan, bisa diketuk</dd></div>
-    </dl>
-    <div class="tools">
-      <button type="button" id="openAll">Buka semua</button>
-      <button type="button" id="closeAll">Tutup semua</button>
+    <p class="sub">Keturunan Kunggit dan Gantihan, dua saudara dari Lemuang</p>
+    <p class="by">Dicatat oleh Lamri, S.P.</p>
+  </div>
+</header>
+<div class="wrap">
+  <p class="hint">Ketuk nama sekali untuk melihat keterangannya, dua kali untuk membuka anak-anaknya. Nama pasangan, ayah, dan ibu tercantum di keterangan. Tanda <i>kawin sepupu</i> bisa diketuk untuk melihat pasangan atau anaknya.</p>
+  <dl class="legend">
+    <div><dt>L</dt><dd>laki-laki</dd></div>
+    <div><dt>P</dt><dd>perempuan</dd></div>
+    <div><dt>Alm. / Almh.</dt><dd>sudah wafat</dd></div>
+  </dl>
+
+  <section class="finder" role="search" aria-labelledby="findTitle">
+    <h2 id="findTitle">Cari dalam silsilah</h2>
+    <div class="qbox">
+      <label for="q" class="sr">Kata pencarian</label>
+      <input id="q" type="search" autocomplete="off" spellcheck="false"
+        placeholder="Nama, nama ayah atau ibu, pasangan, atau tempat">
+      <button type="button" class="qclear" id="qclear" aria-label="Hapus pencarian" hidden>&times;</button>
     </div>
-  </header>
+    <div class="chips" id="fcat" role="group" aria-label="Cari berdasarkan">
+      <button type="button" data-v="semua" aria-pressed="true">Semua</button>
+      <button type="button" data-v="nama" aria-pressed="false">Nama</button>
+      <button type="button" data-v="ortu" aria-pressed="false">Anak dari (ayah/ibu)</button>
+      <button type="button" data-v="pasangan" aria-pressed="false">Pasangan</button>
+      <button type="button" data-v="tempat" aria-pressed="false">Tempat</button>
+    </div>
+    <div class="chips" id="fstat" role="group" aria-label="Status">
+      <button type="button" data-v="semua" aria-pressed="true">Semua status</button>
+      <button type="button" data-v="hidup" aria-pressed="false">Masih hidup</button>
+      <button type="button" data-v="wafat" aria-pressed="false">Sudah wafat</button>
+    </div>
+    <p class="qinfo" id="qinfo" aria-live="polite"></p>
+    <ol class="results" id="results"></ol>
+  </section>
+
+  <div class="tools">
+    <button type="button" id="openAll">Buka semua</button>
+    <button type="button" id="closeAll">Tutup semua</button>
+  </div>
   <main>
     <ul class="tree" id="tree"></ul>
   </main>
 </div>
+<footer aria-hidden="true">&#10086;</footer>
 
 <dialog id="detail" aria-labelledby="dTitle">
   <div class="d-head">
     <h2 id="dTitle"></h2>
     <p class="d-sub" id="dSub"></p>
-    <button type="button" class="d-close" id="dClose" aria-label="Tutup detail">&times;</button>
+    <button type="button" class="d-close" id="dClose" aria-label="Tutup keterangan">&times;</button>
   </div>
   <div class="d-body" id="dBody"></div>
 </dialog>
@@ -1216,7 +1330,7 @@ function renderNode(n, root) {
   }
 
   if (own) {
-    row.append(el("span", { class: "meta" }, own + " anak"));
+    row.append(el("span", { class: "meta" }, (own + ext) + " anak"));
   } else if (ext) {
     row.append(el("span", { class: "meta" }, ext + " anak"));
   } else if (n.tidakBeranak) {
@@ -1399,7 +1513,7 @@ function openDetail(n, opts) {
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19, attribution: "&copy; OpenStreetMap"
     }).addTo(map);
-    L.circleMarker([m.lat, m.lng], { radius: 8, color: "#6B4528", fillColor: "#1D6A73", fillOpacity: .9, weight: 2 })
+    L.circleMarker([m.lat, m.lng], { radius: 8, color: "#1F3B2D", fillColor: "#B8954A", fillOpacity: .9, weight: 2 })
       .addTo(map).bindTooltip(m.nama || "Makam");
     setTimeout(() => map && map.invalidateSize(), 60);
   }
@@ -1409,6 +1523,171 @@ dlg.addEventListener("close", () => { if (map) { map.remove(); map = null; } });
 document.getElementById("dClose").onclick = () => dlg.close();
 dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
 
+/* ---------- Pencarian ---------- */
+(function () {
+  const norm = s => (s == null ? "" : String(s)).toLowerCase().normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "").replace(/[\u2019'`]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+
+  // Semua orang: keturunan dan pasangan dari luar keluarga
+  const seen = new Set(), people = [];
+  allNodes.forEach(n => {
+    if (!n.placeholder && !seen.has(n)) { seen.add(n); people.push(n); }
+    n.unions.forEach(un => { const s = un.spouse; if (s && !un.ref && !seen.has(s)) { seen.add(s); people.push(s); } });
+  });
+
+  function namesOf(p) { return [p.nama, p.panggilan].concat(p.alias ? p.alias.split(/,\s*/) : []).filter(Boolean); }
+  function parentsOf(p) {
+    if (p.isSpouse) return [p.ayah, p.ibu].filter(Boolean);
+    const out = [];
+    if (p.parent && !p.parent.placeholder) out.push(...namesOf(p.parent));
+    const o = p.parentUnion && p.parentUnion.spouse;
+    if (o) out.push(...namesOf(o));
+    return out;
+  }
+  function spousesOf(p) {
+    if (p.isSpouse) return namesOf(p.union.owner);
+    const out = [];
+    couples(p).forEach(c => { if (c.spouse) out.push(...namesOf(c.spouse)); });
+    return out;
+  }
+  function placesOf(p) {
+    return [p.tempatLahir, p.dibesarkan, p.domisili, p.tinggalSekarang, p.tempatWafat, p.makam && p.makam.nama].filter(Boolean);
+  }
+
+  const index = people.filter(p => !p.belumBernama).map(p => ({
+    p,
+    nama: norm(namesOf(p).join(" ")),
+    ortu: norm(parentsOf(p).join(" ")),
+    pasangan: norm(spousesOf(p).join(" ")),
+    tempat: norm(placesOf(p).join(" "))
+  }));
+
+  const q = document.getElementById("q");
+  const qclear = document.getElementById("qclear");
+  const qinfo = document.getElementById("qinfo");
+  const list = document.getElementById("results");
+  let cat = "semua", stat = "semua", limit = 40, timer = null;
+
+  function chipGroup(id, set) {
+    const g = document.getElementById(id);
+    g.addEventListener("click", e => {
+      const b = e.target.closest("button"); if (!b) return;
+      g.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+      set(b.dataset.v); limit = 40; run();
+    });
+  }
+  chipGroup("fcat", v => cat = v);
+  chipGroup("fstat", v => stat = v);
+
+  const has = (field, toks) => toks.every(t => (" " + field).includes(" " + t) || field.includes(t));
+  const LABEL = { nama: "nama cocok", ortu: "anak dari yang dicari", pasangan: "pasangan cocok", tempat: "tempat cocok" };
+
+  function highlight(text, toks) {
+    const frag = document.createDocumentFragment();
+    if (!text) return frag;
+    const esc = toks.filter(t => t.length > 0).map(t => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    if (!esc.length) { frag.append(text); return frag; }
+    const re = new RegExp("(" + esc.join("|") + ")", "ig");
+    let last = 0;
+    text.replace(re, (m, _g, off) => {
+      if (off > last) frag.append(text.slice(last, off));
+      const mk = document.createElement("mark"); mk.textContent = m; frag.append(mk);
+      last = off + m.length; return m;
+    });
+    if (last < text.length) frag.append(text.slice(last));
+    return frag;
+  }
+
+  function relText(p) {
+    if (p.isSpouse) return "Pasangan dari " + fullName(p.union.owner);
+    if (p.parent && p.parent.placeholder) return "Anak dari orang tua Kunggit & Gantihan";
+    const ot = orangTua(p);
+    const bits = [ot.ayah, ot.ibu].filter(Boolean);
+    return bits.length ? "Anak dari " + bits.join(" & ") : "";
+  }
+  function ctxText(p, why) {
+    const out = [];
+    if (!p.isSpouse) {
+      out.push("Keturunan ke-" + p.depth);
+      const cl = cabangLabel(p); if (cl) out.push(p.depth === 2 ? cl.charAt(0).toLowerCase() + cl.slice(1) : "cabang " + cl);
+    }
+    const sp = p.isSpouse ? [] : couples(p).filter(c => c.spouse).map(c => fullName(c.spouse));
+    if (sp.length) out.push("pasangan " + sp.join(", "));
+    if (why.includes("tempat")) {
+      const pl = [];
+      if (p.tempatLahir) pl.push("lahir di " + p.tempatLahir);
+      if (p.wafat !== true && p.tinggalSekarang) pl.push("tinggal di " + p.tinggalSekarang);
+      if (p.wafat === true && p.makam && p.makam.nama) pl.push("makam " + p.makam.nama);
+      if (pl.length) out.push(pl.join(", "));
+    }
+    return out.join("; ");
+  }
+
+  function run() {
+    const raw = q.value;
+    qclear.hidden = !raw;
+    const toks = norm(raw).split(" ").filter(Boolean);
+    list.replaceChildren();
+    if (!toks.length) { qinfo.textContent = ""; return; }
+
+    const cats = cat === "semua" ? ["nama", "ortu", "pasangan", "tempat"] : [cat];
+    const hits = [];
+    index.forEach(e => {
+      if (stat === "hidup" && e.p.wafat !== false) return;
+      if (stat === "wafat" && e.p.wafat !== true) return;
+      const why = cats.filter(c => has(e[c], toks));
+      if (!why.length) return;
+      let score = 0;
+      if (why.includes("nama")) score += 100 + (e.nama.startsWith(toks[0]) ? 50 : 0) + (e.nama === toks.join(" ") ? 50 : 0);
+      if (why.includes("ortu")) score += 40;
+      if (why.includes("pasangan")) score += 30;
+      if (why.includes("tempat")) score += 10;
+      if (e.p.isSpouse) score -= 5;
+      hits.push({ e, why, score });
+    });
+    hits.sort((a, b) => b.score - a.score || a.e.p.nama.localeCompare(b.e.p.nama, "id"));
+
+    qinfo.textContent = hits.length
+      ? hits.length + " orang ditemukan" + (hits.length > limit ? ", " + limit + " teratas ditampilkan" : "")
+      : "Tidak ada yang cocok. Coba ejaan lain, sebagian nama, atau ganti pilihan di atas.";
+
+    hits.slice(0, limit).forEach(({ e, why }) => {
+      const p = e.p;
+      const li = document.createElement("li");
+      const box = el("div", { class: "res" });
+      const who = el("button", { type: "button", class: "who", onclick: () => openDetail(p, { fromRef: true }) });
+      who.append(highlight(p.nama, toks));
+      if (p.jk) who.append(el("span", { class: "jk" }, "(" + p.jk + ")"));
+      if (p.wafat === true) who.append(el("span", { class: "alm" }, almLabel(p)));
+      box.append(who, el("span", { class: "why" }, why.map(w => LABEL[w]).join(", ")));
+      const extra = [];
+      if (p.panggilan) extra.push("dipanggil " + p.panggilan);
+      if (p.alias) extra.push("dikenal juga sebagai " + p.alias);
+      if (extra.length) { const x = el("p", { class: "ctx" }); x.append(highlight(extra.join("; "), toks)); box.append(x); }
+      const rt = relText(p);
+      if (rt) { const r = el("p", { class: "rel" }); r.append(highlight(rt, toks)); box.append(r); }
+      const ct = ctxText(p, why);
+      if (ct) { const c = el("p", { class: "ctx" }); c.append(highlight(ct, toks)); box.append(c); }
+      const target = p.isSpouse ? p.union.owner : p;
+      box.append(el("button", { type: "button", class: "go", onclick: () => jump(target, false) },
+        p.isSpouse ? "Tampilkan " + target.nama + " di pohon" : "Tampilkan di pohon"));
+      li.append(box);
+      list.append(li);
+    });
+    if (hits.length > limit) {
+      const li = document.createElement("li");
+      li.append(el("button", { type: "button", class: "more", onclick: () => { limit = hits.length; run(); } }, "Tampilkan semua " + hits.length + " hasil"));
+      list.append(li);
+    }
+  }
+
+  q.addEventListener("input", () => { clearTimeout(timer); limit = 40; timer = setTimeout(run, 120); });
+  q.addEventListener("keydown", e => { if (e.key === "Escape") { q.value = ""; run(); } });
+  qclear.addEventListener("click", () => { q.value = ""; run(); q.focus(); });
+  document.addEventListener("keydown", e => {
+    if (e.key === "/" && document.activeElement !== q && !dlg.open) { e.preventDefault(); q.focus(); }
+  });
+})();
 </script>
 </body>
 </html>
