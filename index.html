@@ -283,7 +283,8 @@ dialog.sheet[open] { display: flex; }
   border: 1px solid var(--line); background: var(--vellum); color: var(--ink); touch-action: manipulation;
 }
 .opt .n { margin-left: .35rem; color: var(--muted); font-size: .88rem; }
-.opt[aria-pressed="true"] { border-color: var(--binding); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--binding); }
+.opt[aria-pressed="true"] { border-color: var(--binding); background: var(--binding); color: var(--gold-soft); }
+.opt[aria-pressed="true"] .n { color: var(--gold-soft); opacity: .8; }
 .opt[disabled] { opacity: .42; cursor: default; }
 .more-opts { margin-top: .45rem; font-size: .95rem; background: none; border: 0; padding: 0; color: var(--binding); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .more-opts { color: var(--accent); } }
@@ -1035,7 +1036,7 @@ const GANTIHAN = w("Gantihan", "P", { id: "gantihan", anakKe: 2, tempatLahir: "L
                   hsd("Muhammad Rivan", "L", { anakKe: 3 })
                 ]})
               ]}),
-            hsd("Anwar", "L", { anakKe: 3, pasangan: [
+            w("Anwar", "L", { anakKe: 3, tempatLahir: SD, tinggalSekarang: SD, pasangan: [
               u("Samijah", "P", { anak: [
                 h("Rahma", "P", { anakKe: 1, dibesarkan: SD, tinggalSekarang: SD, anak: [
                   h("Afifah", "P", { anakKe: 1, tinggalSekarang: SD })
@@ -1059,7 +1060,7 @@ const GANTIHAN = w("Gantihan", "P", { id: "gantihan", anakKe: 2, tempatLahir: "L
             ]})
           ]}),
           u("Nuning", null, { anak: [
-            h("Normansyah", "L", { anakKe: 1, tinggalSekarang: SD, pasangan: [
+            w("Normansyah", "L", { anakKe: 1, tinggalSekarang: SD, pasangan: [
               u("Mardiana", "P", { anak: [ h("Dian", null, { anakKe: 1, tinggalSekarang: SD }) ] })
             ]}),
             h("Syahlina", "P", { anakKe: 2, tinggalSekarang: SD, pasangan: [
@@ -1710,7 +1711,7 @@ dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
     { key: "garis", title: "Keturunan", fixed: [["Kunggit", "Kunggit"], ["Gantihan", "Gantihan"]] },
     { key: "cabang", title: "Cabang", fixed: ["Singking", "Talenttan", "Pipi", "Layau", "Nanang", "Kidang", "Wiwik"].map(x => [x, x]) },
     { key: "status", title: "Status", fixed: [["hidup", "Masih hidup"], ["wafat", "Sudah wafat"], ["belum", "Belum dicatat"]] },
-    { key: "jk", title: "Jenis kelamin", fixed: [["L", "Laki-laki"], ["P", "Perempuan"], ["belum", "Belum dicatat"]] },
+    { key: "jk", title: "Jenis kelamin", allOption: true, fixed: [["L", "Laki-laki"], ["P", "Perempuan"], ["belum", "Belum dicatat"]] },
     { key: "tinggal", title: "Tempat tinggal sekarang", place: true },
     { key: "lahir", title: "Tempat lahir", place: true },
     { key: "dibesarkan", title: "Tempat dibesarkan", place: true },
@@ -1878,7 +1879,8 @@ dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
     GROUPS.forEach(g => {
       if (g.key === "cari" && applied.cari.has("semua")) return;
       applied[g.key].forEach(v => {
-        const txt = (g.key === "cari" ? "Cari di: " : g.key === "gen" ? "Keturunan " : "") + labelOf(g.key, v);
+        const PRE = { tinggal: "Tinggal: ", lahir: "Lahir: ", dibesarkan: "Dibesarkan: ", domisili: "Domisili: ", makam: "Makam: ", cabang: "Cabang ", gen: "Keturunan ", cari: "Cari di: " };
+        const txt = (PRE[g.key] || "") + labelOf(g.key, v);
         activeBox.append(el("button", { type: "button", title: "Hapus filter ini", onclick: () => {
           applied[g.key].delete(v); if (g.key === "cari") applied.cari.add("semua"); limit = 40; run();
         } }, txt, el("span", { "aria-hidden": "true" }, "\u00d7")));
@@ -1968,6 +1970,13 @@ dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
       const all = OPTS[g.key];
       const MAX = 8;
       const shown = expanded.has(g.key) ? all : all.slice(0, MAX);
+      if (g.allOption) {
+        const none = !draft[g.key].size;
+        const ball = el("button", { type: "button", class: "opt", "aria-pressed": String(none) }, "Semua");
+        if (base) ball.append(el("span", { class: "n" }, "(" + base.length + ")"));
+        ball.addEventListener("click", () => { draft[g.key].clear(); renderSheet(); });
+        opts.append(ball);
+      }
       all.forEach((o, i) => {
         const sel = draft[g.key].has(o.v);
         if (!shown.includes(o) && !sel) return;
